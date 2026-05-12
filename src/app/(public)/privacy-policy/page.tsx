@@ -2,8 +2,16 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Siribaan Property Group',
+  title: 'Privacy Policy',
   description: 'How Siribaan Property Group collects, uses, and protects your personal information in compliance with the Thailand Personal Data Protection Act (PDPA).',
+  alternates: { canonical: '/privacy-policy' },
+  openGraph: {
+    title: 'Privacy Policy | Siribaan Property Group',
+    description: 'How Siribaan Property Group collects, uses, and protects your personal information under Thailand\'s PDPA.',
+    images: [{ url: '/og-default.jpg', width: 1200, height: 630, alt: 'Siribaan Property Group' }],
+    type: 'website',
+  },
+  robots: { index: false, follow: false },
 }
 
 export default function PrivacyPolicyPage() {

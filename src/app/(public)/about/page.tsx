@@ -5,10 +5,24 @@ import { CheckCircle, Award, Globe, Users, ArrowRight, MapPin, Phone, Mail, Cloc
 import { InquiryForm } from '@/features/inquiry/components/inquiry-form'
 import { MapEmbed } from '@/components/map-embed'
 import { AnimateIn, AnimateInView } from '@/components/animate-in'
+import { organizationJsonLd } from '@/lib/jsonld'
 
 export const metadata: Metadata = {
-  title: 'About Us | Siribaan Property Group',
+  title: 'About Us',
   description: 'Learn about Siribaan Property Group — Bangkok\'s leading luxury real estate specialists with a curated portfolio of exclusive residences across Sukhumvit, Riverside, and Thonglor.',
+  alternates: { canonical: '/about' },
+  openGraph: {
+    title: 'About Us | Siribaan Property Group',
+    description: 'Learn about Siribaan Property Group — Bangkok\'s leading luxury real estate specialists with a curated portfolio of exclusive residences across Sukhumvit, Riverside, and Thonglor.',
+    images: [{ url: '/og-about.jpg', width: 1200, height: 630, alt: 'Siribaan Property Group team and office' }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About Us | Siribaan Property Group',
+    description: 'Learn about Siribaan Property Group — Bangkok\'s leading luxury real estate specialists.',
+    images: ['/og-about.jpg'],
+  },
 }
 
 const OFFICE_ADDRESS = '1840 Sukhumvit Rd, Phra Khanong Tai, Bangkok 10260'
@@ -46,6 +60,10 @@ const values = [
 export default function AboutPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
       {/* HERO — contained image + overlapping liquid card */}
       <section className="relative bg-blue-50 pt-6 md:pt-10 pb-0">
 

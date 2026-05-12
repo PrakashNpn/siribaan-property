@@ -2,8 +2,16 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | Siribaan Property Group',
+  title: 'Terms of Service',
   description: 'Terms and conditions governing your use of the Siribaan Property Group website and services.',
+  alternates: { canonical: '/terms' },
+  openGraph: {
+    title: 'Terms of Service | Siribaan Property Group',
+    description: 'Terms and conditions governing your use of the Siribaan Property Group website and services.',
+    images: [{ url: '/og-default.jpg', width: 1200, height: 630, alt: 'Siribaan Property Group' }],
+    type: 'website',
+  },
+  robots: { index: false, follow: false },
 }
 
 export default function TermsPage() {

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Suspense } from 'react'
@@ -10,6 +11,24 @@ import { InquiryForm } from '@/features/inquiry/components/inquiry-form'
 import { FadeIn, FadeUp, SlideRight, StaggerCard } from './_components/listing-animations'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Properties',
+  description: 'Browse our curated portfolio of luxury properties in Bangkok — Sukhumvit, Riverside, Thonglor, and beyond.',
+  alternates: { canonical: '/properties' },
+  openGraph: {
+    title: 'Luxury Properties in Bangkok | Siribaan Property Group',
+    description: 'Browse our curated portfolio of luxury properties in Bangkok — Sukhumvit, Riverside, Thonglor, and beyond.',
+    images: [{ url: '/og-properties.jpg', width: 1200, height: 630, alt: 'Bangkok luxury property listings' }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Luxury Properties in Bangkok | Siribaan Property Group',
+    description: 'Browse our curated portfolio of luxury properties in Bangkok — Sukhumvit, Riverside, Thonglor, and beyond.',
+    images: ['/og-properties.jpg'],
+  },
+}
 
 interface SearchParams {
   location?: string
