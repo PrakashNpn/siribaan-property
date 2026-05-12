@@ -10,7 +10,6 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/properties', label: 'Properties' },
   { href: '/about', label: 'About Us' },
-  { href: '/contact', label: 'Contact Us' },
 ]
 
 export function Navbar() {
@@ -24,10 +23,10 @@ export function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
             <div className="w-9 h-9 relative">
-              <Image src="/logo/logo.png" alt="Siribaan Logo" fill sizes="36px" className="object-contain" />
+              <Image src="/logo/logo-transparent.png" alt="Siribaan Logo" fill sizes="36px" className="object-contain" />
             </div>
             <span className="font-bold text-sm text-blue-600 uppercase tracking-wider leading-tight">
-              Siribaan<br />Property Group
+              Siribaan<br />Property
             </span>
           </Link>
 
@@ -51,7 +50,7 @@ export function Navbar() {
 
           <div className="flex items-center gap-3">
             <Link
-              href="/contact"
+              href="/about#contact"
               className="hidden md:block bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
             >
               Enquire Now
@@ -87,7 +86,7 @@ export function Navbar() {
             ))}
             <div className="pt-3 border-t border-gray-100">
               <Link
-                href="/contact"
+                href="/about#contact"
                 onClick={() => setMobileOpen(false)}
                 className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-3 rounded-full transition-colors"
               >

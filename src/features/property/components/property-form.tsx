@@ -3,8 +3,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { propertySchema, PropertyFormData } from '../validation'
+import { propertySchema, PropertyFormData, PROPERTY_TYPES, PROPERTY_STATUSES, UnitTypeFormData } from '../validation'
 import { Property } from '../types'
+import { UnitTypeManager } from './unit-type-manager'
 
 interface PropertyFormProps {
   property?: Property
@@ -27,40 +28,58 @@ export function PropertyForm({ property }: PropertyFormProps) {
   const router = useRouter()
   const [uploading, setUploading] = useState(false)
   const [imageUrls, setImageUrls] = useState<string[]>(property?.images || [])
+  const [nearbyInput, setNearbyInput] = useState('')
+  const [pendingUnitTypes, setPendingUnitTypes] = useState<UnitTypeFormData[]>([])
 
   const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<PropertyFormData>({
     resolver: zodResolver(propertySchema),
     defaultValues: property ? {
       title: property.title,
+      slug: property.slug,
       description: property.description,
-      price: property.price,
+      type: property.type as typeof PROPERTY_TYPES[number],
+      status: property.status as typeof PROPERTY_STATUSES[number],
+      tag: property.tag || '',
+      featured: property.featured,
       location: property.location,
       address: property.address,
-      bedrooms: property.bedrooms,
-      bathrooms: property.bathrooms,
-      areaSqm: property.areaSqm,
-      parking: property.parking,
-      type: property.type as 'For Sale' | 'For Rent',
-      status: property.status as 'active' | 'sold' | 'rented',
-      tag: property.tag || '',
+      nearbyPlaces: property.nearbyPlaces,
+      yearBuilt: property.yearBuilt ?? undefined,
+      completionDate: property.completionDate ?? undefined,
+      totalFloors: property.totalFloors ?? undefined,
+      totalUnits: property.totalUnits ?? undefined,
       images: property.images,
       amenities: property.amenities,
     } : {
-      type: 'For Sale',
+      type: 'Condo',
       status: 'active',
+      featured: false,
       images: [],
       amenities: [],
+      nearbyPlaces: [],
     },
   })
 
   const watchedAmenities = watch('amenities') || []
+  const watchedNearby = watch('nearbyPlaces') || []
+  const watchedFeatured = watch('featured')
 
   const toggleAmenity = (amenity: string) => {
-    const current = watchedAmenities
-    const updated = current.includes(amenity)
-      ? current.filter((a) => a !== amenity)
-      : [...current, amenity]
+    const updated = watchedAmenities.includes(amenity)
+      ? watchedAmenities.filter((a) => a !== amenity)
+      : [...watchedAmenities, amenity]
     setValue('amenities', updated)
+  }
+
+  const addNearbyPlace = () => {
+    const trimmed = nearbyInput.trim()
+    if (!trimmed || watchedNearby.includes(trimmed)) return
+    setValue('nearbyPlaces', [...watchedNearby, trimmed])
+    setNearbyInput('')
+  }
+
+  const removeNearbyPlace = (place: string) => {
+    setValue('nearbyPlaces', watchedNearby.filter((p) => p !== place))
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,10 +105,11 @@ export function PropertyForm({ property }: PropertyFormProps) {
   const onSubmit = async (data: PropertyFormData) => {
     const url = property ? `/api/properties/${property.id}` : '/api/properties'
     const method = property ? 'PUT' : 'POST'
+    const body = property ? data : { ...data, unitTypes: pendingUnitTypes }
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(body),
     })
     if (res.ok) {
       router.push('/admin/properties')
@@ -103,71 +123,45 @@ export function PropertyForm({ property }: PropertyFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        {/* Title */}
         <div className="md:col-span-2">
           <label className={labelClass}>Title</label>
-          <input {...register('title')} placeholder="Property title" className={inputClass} />
+          <input {...register('title')} placeholder="e.g. The Residences at Sukhumvit 39" className={inputClass} />
           {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>}
         </div>
 
+        {/* Slug */}
+        <div className="md:col-span-2">
+          <label className={labelClass}>Slug</label>
+          <input {...register('slug')} placeholder="e.g. the-residences-sukhumvit-39" className={inputClass} />
+          {errors.slug && <p className="text-red-500 text-xs mt-1">{errors.slug.message}</p>}
+        </div>
+
+        {/* Description */}
         <div className="md:col-span-2">
           <label className={labelClass}>Description</label>
           <textarea {...register('description')} rows={4} placeholder="Property description" className={`${inputClass} resize-none`} />
           {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
         </div>
 
+        {/* Type */}
         <div>
-          <label className={labelClass}>Price (฿)</label>
-          <input {...register('price', { valueAsNumber: true })} type="number" placeholder="145000000" className={inputClass} />
-          {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>}
-        </div>
-
-        <div>
-          <label className={labelClass}>Location</label>
-          <input {...register('location')} placeholder="Sukhumvit, Bangkok" className={inputClass} />
-        </div>
-
-        <div className="md:col-span-2">
-          <label className={labelClass}>Address</label>
-          <input {...register('address')} placeholder="Full address" className={inputClass} />
-        </div>
-
-        <div>
-          <label className={labelClass}>Bedrooms</label>
-          <input {...register('bedrooms', { valueAsNumber: true })} type="number" min="0" className={inputClass} />
-        </div>
-
-        <div>
-          <label className={labelClass}>Bathrooms</label>
-          <input {...register('bathrooms', { valueAsNumber: true })} type="number" min="0" className={inputClass} />
-        </div>
-
-        <div>
-          <label className={labelClass}>Area (sqm)</label>
-          <input {...register('areaSqm', { valueAsNumber: true })} type="number" min="0" className={inputClass} />
-        </div>
-
-        <div>
-          <label className={labelClass}>Parking</label>
-          <input {...register('parking', { valueAsNumber: true })} type="number" min="0" className={inputClass} />
-        </div>
-
-        <div>
-          <label className={labelClass}>Type</label>
+          <label className={labelClass}>Property Type</label>
           <select {...register('type')} className={inputClass}>
-            <option value="For Sale">For Sale</option>
-            <option value="For Rent">For Rent</option>
+            {PROPERTY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
 
+        {/* Status */}
         <div>
           <label className={labelClass}>Status</label>
           <select {...register('status')} className={inputClass}>
-            <option value="active">Active</option>
-            <option value="sold">Sold</option>
-            <option value="rented">Rented</option>
+            {PROPERTY_STATUSES.map((s) => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
           </select>
         </div>
 
+        {/* Tag */}
         <div>
           <label className={labelClass}>Tag (optional)</label>
           <select {...register('tag')} className={inputClass}>
@@ -178,6 +172,89 @@ export function PropertyForm({ property }: PropertyFormProps) {
             <option value="RIVERSIDE">Riverside</option>
           </select>
         </div>
+
+        {/* Featured */}
+        <div className="flex items-center gap-3 pt-5">
+          <button
+            type="button"
+            onClick={() => setValue('featured', !watchedFeatured)}
+            className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${watchedFeatured ? 'bg-[#125DE5]' : 'bg-gray-200'}`}
+          >
+            <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${watchedFeatured ? 'translate-x-5' : 'translate-x-0.5'}`} />
+          </button>
+          <label className="text-sm font-medium text-gray-700">Featured on homepage</label>
+        </div>
+
+        {/* Location */}
+        <div>
+          <label className={labelClass}>Location / Area</label>
+          <input {...register('location')} placeholder="e.g. Sukhumvit, Bangkok" className={inputClass} />
+          {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location.message}</p>}
+        </div>
+
+        {/* Address */}
+        <div>
+          <label className={labelClass}>Full Address</label>
+          <input {...register('address')} placeholder="Full address for map" className={inputClass} />
+          {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>}
+        </div>
+
+        {/* Year Built */}
+        <div>
+          <label className={labelClass}>Year Built (optional)</label>
+          <input {...register('yearBuilt', { valueAsNumber: true, setValueAs: (v) => v === '' ? null : Number(v) })} type="number" placeholder="e.g. 2018" className={inputClass} />
+        </div>
+
+        {/* Completion Date */}
+        <div>
+          <label className={labelClass}>Completion Date (optional)</label>
+          <input {...register('completionDate')} placeholder="e.g. Q4 2026" className={inputClass} />
+        </div>
+
+        {/* Total Floors */}
+        <div>
+          <label className={labelClass}>Total Floors (optional)</label>
+          <input {...register('totalFloors', { valueAsNumber: true, setValueAs: (v) => v === '' ? null : Number(v) })} type="number" min="1" className={inputClass} />
+        </div>
+
+        {/* Total Units */}
+        <div>
+          <label className={labelClass}>Total Units (optional)</label>
+          <input {...register('totalUnits', { valueAsNumber: true, setValueAs: (v) => v === '' ? null : Number(v) })} type="number" min="1" className={inputClass} />
+        </div>
+
+        {/* Land Area */}
+        <div>
+          <label className={labelClass}>Land Area (sqm) (optional)</label>
+          <input {...register('landAreaSqm', { valueAsNumber: true, setValueAs: (v) => v === '' ? null : Number(v) })} type="number" min="0" step="0.1" placeholder="For houses and villas" className={inputClass} />
+        </div>
+      </div>
+
+      {/* Nearby Places */}
+      <div>
+        <label className={labelClass}>Nearby Places (BTS, MRT, Schools...)</label>
+        <div className="flex gap-2 mb-2">
+          <input
+            value={nearbyInput}
+            onChange={(e) => setNearbyInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addNearbyPlace() } }}
+            placeholder="e.g. BTS Phrom Phong (200m)"
+            className={inputClass}
+          />
+          <button type="button" onClick={addNearbyPlace} className="px-4 py-2 bg-[#125DE5] text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors shrink-0">
+            Add
+          </button>
+        </div>
+        {watchedNearby.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {watchedNearby.map((place) => (
+              <span key={place} className="flex items-center gap-1.5 bg-blue-50 text-[#125DE5] text-xs font-medium px-3 py-1.5 rounded-full">
+                {place}
+                <button type="button" onClick={() => removeNearbyPlace(place)} className="hover:text-red-500 transition-colors">×</button>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Images */}
@@ -224,7 +301,7 @@ export function PropertyForm({ property }: PropertyFormProps) {
               onClick={() => toggleAmenity(amenity)}
               className={`text-left text-sm px-4 py-2.5 rounded-xl border transition-colors ${
                 watchedAmenities.includes(amenity)
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
+                  ? 'border-[#125DE5] bg-blue-50 text-[#125DE5]'
                   : 'border-gray-200 text-gray-600 hover:border-gray-300'
               }`}
             >
@@ -234,11 +311,27 @@ export function PropertyForm({ property }: PropertyFormProps) {
         </div>
       </div>
 
+      {/* Unit Types — only on create, edit page handles them separately */}
+      {!property && (
+        <div className="border-t border-gray-100 pt-6">
+          <div className="mb-4">
+            <p className="text-sm font-bold text-gray-900">Unit Types</p>
+            <p className="text-xs text-gray-400 mt-0.5">Add the unit types available in this property before saving.</p>
+          </div>
+          <UnitTypeManager
+            propertyId=""
+            unitTypes={[]}
+            pendingUnitTypes={pendingUnitTypes}
+            onPendingChange={setPendingUnitTypes}
+          />
+        </div>
+      )}
+
       <div className="flex gap-3 pt-4">
         <button
           type="submit"
           disabled={isSubmitting || uploading}
-          className="bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-8 py-3 rounded-xl transition-colors text-sm"
+          className="bg-[#125DE5] hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-8 py-3 rounded-xl transition-colors text-sm"
         >
           {isSubmitting ? 'Saving...' : property ? 'Update Property' : 'Create Property'}
         </button>

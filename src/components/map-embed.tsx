@@ -7,7 +7,7 @@ export function MapEmbed({ address, height = 'h-72' }: MapEmbedProps) {
   const src = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&output=embed&z=15`
 
   return (
-    <div className={`${height} w-full rounded-2xl overflow-hidden border border-gray-100`}>
+    <div className={`${height} w-full rounded-2xl overflow-hidden border border-blue-100/70 shadow-[0_4px_24px_rgba(18,93,229,0.08)]`}>
       <iframe
         src={src}
         width="100%"

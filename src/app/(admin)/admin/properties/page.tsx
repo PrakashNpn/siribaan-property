@@ -51,12 +51,14 @@ export default async function AdminPropertiesPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">{property.location}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-gray-900">฿{formatPrice(property.price)}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                    {property.unitTypes.length > 0
+                      ? `฿${formatPrice(Math.min(...property.unitTypes.map((u) => u.priceMin)))}`
+                      : '—'}
+                  </td>
                   <td className="px-6 py-4">
                     <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                      property.status === 'active' ? 'bg-green-50 text-green-700' :
-                      property.status === 'sold' ? 'bg-red-50 text-red-700' :
-                      'bg-yellow-50 text-yellow-700'
+                      property.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'
                     }`}>
                       {property.status}
                     </span>

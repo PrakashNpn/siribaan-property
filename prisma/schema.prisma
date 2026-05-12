@@ -7,23 +7,47 @@ datasource db {
 }
 
 model Property {
-  id          String    @id @default(cuid())
-  title       String
-  description String
-  price       Float
-  location    String
-  address     String
-  bedrooms    Int
-  bathrooms   Int
-  areaSqm     Float
-  parking     Int
-  type        String
-  status      String    @default("active")
-  tag         String?
-  images      String[]
-  amenities   String[]
-  createdAt   DateTime  @default(now())
-  inquiries   Inquiry[]
+  id             String     @id @default(cuid())
+  title          String
+  slug           String     @unique
+  description    String
+  type           String
+  status         String     @default("active")
+  tag            String?
+  featured       Boolean    @default(false)
+  location       String
+  address        String
+  nearbyPlaces   String[]
+  yearBuilt      Int?
+  completionDate String?
+  totalFloors    Int?
+  totalUnits     Int?
+  landAreaSqm    Float?
+  images         String[]
+  amenities      String[]
+  unitTypes      UnitType[]
+  inquiries      Inquiry[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model UnitType {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  name       String
+  bedrooms   Int
+  bathrooms  Int
+  areaSqmMin Float
+  areaSqmMax Float?
+  priceMin   Float
+  priceMax   Float?
+  parking    Int      @default(1)
+  floorMin   Int?
+  floorMax   Int?
+  available  Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Inquiry {

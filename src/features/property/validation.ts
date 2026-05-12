@@ -1,20 +1,42 @@
 import { z } from 'zod'
 
+export const PROPERTY_TYPES = ['Condo', 'House', 'Villa', 'Townhouse', 'Apartment'] as const
+export const PROPERTY_STATUSES = ['active', 'inactive'] as const
+
 export const propertySchema = z.object({
   title: z.string().min(1, 'Title is required'),
+  slug: z.string().min(1, 'Slug is required').regex(/^[a-z0-9-]+$/, 'Slug must be lowercase letters, numbers, and hyphens only'),
   description: z.string().min(1, 'Description is required'),
-  price: z.number().positive('Price must be positive'),
+  type: z.enum(PROPERTY_TYPES),
+  status: z.enum(PROPERTY_STATUSES),
+  tag: z.string().optional().nullable(),
+  featured: z.boolean(),
   location: z.string().min(1, 'Location is required'),
   address: z.string().min(1, 'Address is required'),
-  bedrooms: z.number().int().min(0),
-  bathrooms: z.number().int().min(0),
-  areaSqm: z.number().positive(),
-  parking: z.number().int().min(0),
-  type: z.enum(['For Sale', 'For Rent']),
-  status: z.enum(['active', 'sold', 'rented']),
-  tag: z.string().optional(),
+  nearbyPlaces: z.array(z.string()),
+  yearBuilt: z.number().int().min(1900).max(2100).optional().nullable(),
+  completionDate: z.string().optional().nullable(),
+  totalFloors: z.number().int().min(1).optional().nullable(),
+  totalUnits: z.number().int().min(1).optional().nullable(),
+  landAreaSqm: z.number().positive().optional().nullable(),
   images: z.array(z.string()),
   amenities: z.array(z.string()),
 })
 
 export type PropertyFormData = z.infer<typeof propertySchema>
+
+export const unitTypeSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  bedrooms: z.number().int().min(0),
+  bathrooms: z.number().int().min(0),
+  areaSqmMin: z.number().positive('Area must be positive'),
+  areaSqmMax: z.number().positive().optional().nullable(),
+  priceMin: z.number().positive('Price must be positive'),
+  priceMax: z.number().positive().optional().nullable(),
+  parking: z.number().int().min(0),
+  floorMin: z.number().int().min(1).optional().nullable(),
+  floorMax: z.number().int().min(1).optional().nullable(),
+  available: z.number().int().min(0).optional().nullable(),
+})
+
+export type UnitTypeFormData = z.infer<typeof unitTypeSchema>

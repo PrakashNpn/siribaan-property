@@ -33,11 +33,11 @@ export function ImageCarousel({ images, alt, tag, location }: ImageCarouselProps
   }, [images.length, next])
 
   if (images.length === 0) {
-    return <div className="h-[55vh] bg-gray-200" />
+    return <div className="h-[65vh] bg-gray-200" />
   }
 
   return (
-    <section className="relative h-[55vh] overflow-hidden bg-gray-900 group">
+    <section className="relative h-[65vh] overflow-hidden bg-gray-900 group">
       {/* Images */}
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
@@ -66,7 +66,7 @@ export function ImageCarousel({ images, alt, tag, location }: ImageCarouselProps
       </AnimatePresence>
 
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent z-10 pointer-events-none" />
 
       {/* Badges */}
       {(tag || location) && (
