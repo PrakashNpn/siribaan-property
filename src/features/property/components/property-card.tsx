@@ -11,9 +11,7 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
-  const startingPrice = property.unitTypes.length > 0
-    ? Math.min(...property.unitTypes.map((u) => u.priceMin))
-    : null
+  const startingPrice = property.startingPrice ?? null
 
   const bedroomOptions = [...new Set(property.unitTypes.map((u) => u.bedrooms))].sort((a, b) => a - b)
   const bathroomOptions = [...new Set(property.unitTypes.map((u) => u.bathrooms))].sort((a, b) => a - b)
@@ -30,7 +28,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
       transition={{ duration: 0.2 }}
       className="h-full"
     >
-      <Link href={`/properties/${property.id}`} className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
+      <Link href={`/properties/${property.slug}`} className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
         <div className="relative aspect-[16/10] overflow-hidden shrink-0">
           {property.images[0] ? (
             <Image

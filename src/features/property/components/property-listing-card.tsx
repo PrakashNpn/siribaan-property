@@ -11,14 +11,12 @@ interface PropertyListingCardProps {
 }
 
 export function PropertyListingCard({ property }: PropertyListingCardProps) {
-  const startingPrice = property.unitTypes.length > 0
-    ? Math.min(...property.unitTypes.map((u) => u.priceMin))
-    : null
+  const startingPrice = property.startingPrice ?? null
 
   const bedroomOptions = [...new Set(property.unitTypes.map((u) => u.bedrooms))].sort((a, b) => a - b)
   const bathroomOptions = [...new Set(property.unitTypes.map((u) => u.bathrooms))].sort((a, b) => a - b)
   const areaMin = property.unitTypes.length > 0 ? Math.min(...property.unitTypes.map(u => u.areaSqmMin)) : null
-  const areaMax = property.unitTypes.length > 0 ? Math.max(...property.unitTypes.map(u => u.areaSqmMax ?? u.areaSqmMin)) : null
+  const areaMax = property.unitTypes.length > 0 ? Math.max(...property.unitTypes.map(u => u.areaSqmMin)) : null
 
   const formatRange = (values: number[]) => {
     if (values.length === 0) return '—'
@@ -29,7 +27,7 @@ export function PropertyListingCard({ property }: PropertyListingCardProps) {
   return (
     <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
       <Link
-        href={`/properties/${property.id}`}
+        href={`/properties/${property.slug}`}
         className="group flex flex-col sm:flex-row bg-white/70 backdrop-blur-sm border border-blue-100/70 rounded-2xl shadow-[0_2px_16px_rgba(18,93,229,0.07)] overflow-hidden hover:shadow-[0_4px_24px_rgba(18,93,229,0.13)] transition-shadow duration-300 sm:h-48"
       >
         {/* Image — full width on mobile, fixed sidebar on sm+ */}

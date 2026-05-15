@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { propertyService } from '@/features/property/server/property.service'
 import { propertySchema, unitTypeSchema } from '@/features/property/validation'
+import { resolveShortMapUrl } from '@/lib/utils'
 import { z } from 'zod'
 
 const createPropertySchema = propertySchema.extend({
@@ -27,6 +28,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
   }
   const { unitTypes, ...propertyData } = parsed.data
-  const property = await propertyService.createWithUnitTypes(propertyData, unitTypes ?? [])
-  return NextResponse.json(property, { status: 201 })
+  if (propertyData.mapUrl) {
+    propertyData.mapUrl = await resolveShortMapUrl(propertyData.mapUrl)
+  }
+  try {
+    const property = await propertyService.createWithUnitTypes(propertyData, unitTypes ?? [])
+    return NextResponse.json(property, { status: 201 })
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[POST /api/properties]', msg)
+    if (msg.includes('Unique constraint') && msg.includes('slug')) {
+      return NextResponse.json({ message: 'A property with this title already exists. Please use a different title.' }, { status: 409 })
+    }
+    return NextResponse.json({ message: 'Failed to create property.', detail: msg }, { status: 500 })
+  }
 }

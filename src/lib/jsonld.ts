@@ -30,15 +30,8 @@ export const organizationJsonLd = {
 }
 
 export function propertyJsonLd(property: Property) {
-  const startingPrice =
-    property.unitTypes.length > 0
-      ? Math.min(...property.unitTypes.map((u) => u.priceMin))
-      : null
-
-  const maxPrice =
-    property.unitTypes.length > 0
-      ? Math.max(...property.unitTypes.map((u) => u.priceMax ?? u.priceMin))
-      : null
+  const startingPrice = property.startingPrice ?? null
+  const maxPrice = startingPrice
 
   const bedroomsMin =
     property.unitTypes.length > 0
@@ -72,7 +65,6 @@ export function propertyJsonLd(property: Property) {
       '@type': 'Offer',
       priceCurrency: 'THB',
       price: startingPrice,
-      ...(maxPrice && maxPrice !== startingPrice ? { priceSpecification: { '@type': 'PriceSpecification', minPrice: startingPrice, maxPrice, priceCurrency: 'THB' } } : {}),
       availability: 'https://schema.org/InStock',
       seller: { '@type': 'RealEstateAgent', name: 'Siribaan Property Group', url: BASE },
     }

@@ -9,6 +9,8 @@ export const propertyService = {
 
   getById: (id: string) => propertyRepository.findById(id),
 
+  getBySlug: (slug: string) => propertyRepository.findBySlug(slug),
+
   getFeatured: (limit?: number) => propertyRepository.findFeatured(limit),
 
   getRecommended: (excludeId: string, limit?: number) =>
@@ -23,10 +25,13 @@ export const propertyService = {
 
   delete: (id: string) => propertyRepository.delete(id),
 
-  getAllAdmin: () => propertyRepository.findAllAdmin(),
+  getAllAdmin: (filters?: { search?: string; status?: string; type?: string; sort?: string }) =>
+    propertyRepository.findAllAdmin(filters),
 
   createUnitType: (propertyId: string, data: UnitTypeFormData) =>
     propertyRepository.createUnitType(propertyId, data),
+
+  getUnitTypeById: (id: string) => propertyRepository.getUnitTypeById(id),
 
   updateUnitType: (id: string, data: Partial<UnitTypeFormData>) =>
     propertyRepository.updateUnitType(id, data),

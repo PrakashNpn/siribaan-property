@@ -5,13 +5,6 @@ import Image from 'next/image'
 import { X, ChevronLeft, ChevronRight, Images } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 
-const PLACEHOLDERS = [
-  'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&q=80',
-  'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
-  'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80',
-  'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80',
-]
-
 interface PropertyGalleryProps {
   images: string[]
   alt: string
@@ -63,7 +56,6 @@ function Lightbox({
       className="fixed inset-0 z-50 flex flex-col"
       onClick={onClose}
     >
-      {/* Liquid background — blurred page + brand orbs */}
       <div className="absolute inset-0 bg-blue-50/10 backdrop-blur-md" />
       <div className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-[#125DE5] blur-3xl opacity-[0.12] pointer-events-none" />
       <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full bg-[#125DE5] blur-3xl opacity-[0.12] pointer-events-none" />
@@ -71,7 +63,6 @@ function Lightbox({
       <div className="absolute top-0 right-1/4 w-[400px] h-[400px] rounded-full bg-white blur-3xl opacity-[0.15] pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] rounded-full bg-white blur-3xl opacity-[0.15] pointer-events-none" />
 
-      {/* Progress bar */}
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#125DE5]/15 z-20">
         <motion.div
           className="h-full bg-[#125DE5]"
@@ -81,7 +72,6 @@ function Lightbox({
         />
       </div>
 
-      {/* Inner content — scales up on open */}
       <motion.div
         initial={{ scale: 0.94, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -90,7 +80,6 @@ function Lightbox({
         className="relative flex flex-col h-full z-10"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top bar */}
         <div className="flex items-center justify-between px-6 py-4 shrink-0 border-b border-[#125DE5]/10">
           <div className="flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-[#125DE5]" />
@@ -107,7 +96,6 @@ function Lightbox({
           </button>
         </div>
 
-        {/* Main image */}
         <div className="flex-1 relative overflow-hidden">
           <AnimatePresence initial={false} custom={direction}>
             <motion.div
@@ -137,7 +125,6 @@ function Lightbox({
             </motion.div>
           </AnimatePresence>
 
-          {/* Nav buttons */}
           {images.length > 1 && (
             <>
               <button
@@ -156,7 +143,6 @@ function Lightbox({
           )}
         </div>
 
-        {/* Thumbnail strip */}
         {images.length > 1 && (
           <div className="shrink-0 border-t border-[#125DE5]/10 bg-white/30 backdrop-blur-sm px-6 py-4">
             <div className="flex gap-2.5 overflow-x-auto justify-center">
@@ -182,88 +168,93 @@ function Lightbox({
   )
 }
 
+function ViewAllButton({ count, onClick }: { count: number; onClick: () => void }) {
+  return (
+    <button
+      onClick={(e) => { e.stopPropagation(); onClick() }}
+      className="absolute inset-0 flex items-end justify-end p-3 z-10"
+    >
+      <span className="bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-lg hover:bg-white transition-colors">
+        <Images size={13} className="text-[#125DE5]" />
+        View all {count} photos
+      </span>
+    </button>
+  )
+}
+
 export function PropertyGallery({ images, alt, tag }: PropertyGalleryProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
-  // Pad with placeholders only for display — lightbox uses real images only
-  const displayImages = [
-    images[0] ?? PLACEHOLDERS[0],
-    images[1] ?? PLACEHOLDERS[1],
-    images[2] ?? PLACEHOLDERS[2],
-    images[3] ?? PLACEHOLDERS[3],
-  ]
-  const lightboxImages = images.length > 0 ? images : PLACEHOLDERS
-  const photoCount = images.length > 0 ? images.length : PLACEHOLDERS.length
+  const count = images.length
 
   const openLightbox = (i: number) => {
-    setLightboxIndex(Math.min(i, lightboxImages.length - 1))
+    setLightboxIndex(Math.min(i, count - 1))
     setLightboxOpen(true)
   }
 
-  const mainImage = displayImages[0]
-  const topRight = displayImages[1]
-  const bottomRight1 = displayImages[2]
-  const bottomRight2 = displayImages[3]
+  if (count === 0) return null
+
+  const [img0, img1, img2, img3] = images
 
   return (
     <>
       <div className="bg-blue-50 py-4">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
 
-          {/* MOBILE layout: main image + 3 thumbnails row */}
+          {/* MOBILE layout */}
           <div className="md:hidden flex flex-col gap-2 h-[55vh]">
             <div
-              className="relative flex-[3] rounded-2xl overflow-hidden cursor-pointer group"
+              className="relative rounded-2xl overflow-hidden cursor-pointer group"
+              style={{ flex: count > 1 ? 3 : 1 }}
               onClick={() => openLightbox(0)}
             >
-              <Image
-                src={mainImage}
-                alt={alt}
-                fill
-                sizes="100vw"
-                className="object-cover"
-                priority
-              />
+              <Image src={img0} alt={alt} fill sizes="100vw" className="object-cover" priority />
               {tag && (
                 <span className="absolute top-3 left-3 bg-[#125DE5] text-white text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wide z-10">
                   {tag}
                 </span>
               )}
+              {count === 1 && <ViewAllButton count={count} onClick={() => openLightbox(0)} />}
             </div>
-            <div className="flex gap-2 flex-[1]">
-              {[topRight, bottomRight1, bottomRight2].map((src, i) => (
-                <div
-                  key={i}
-                  className="relative flex-1 rounded-xl overflow-hidden cursor-pointer"
-                  onClick={() => openLightbox(i + 1)}
-                >
-                  <Image src={src} alt={`${alt} ${i + 2}`} fill sizes="33vw" className="object-cover" />
-                  {i === 2 && (
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                      <span className="text-white text-xs font-semibold flex items-center gap-1">
-                        <Images size={12} /> {photoCount}
-                      </span>
+            {count > 1 && (
+              <div className="flex gap-2 flex-[1]">
+                {images.slice(1, 4).map((src, i) => {
+                  const isLast = i === Math.min(count - 2, 2)
+                  return (
+                    <div
+                      key={i}
+                      className="relative flex-1 rounded-xl overflow-hidden cursor-pointer"
+                      onClick={() => openLightbox(i + 1)}
+                    >
+                      <Image src={src} alt={`${alt} ${i + 2}`} fill sizes="33vw" className="object-cover" />
+                      {isLast && (
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                          <span className="text-white text-xs font-semibold flex items-center gap-1">
+                            <Images size={12} /> {count}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
-          {/* DESKTOP layout: left big | right [top wide + bottom 2 small] */}
-          <div className="hidden md:grid md:grid-cols-[55fr_45fr] gap-2 h-[62vh]">
+          {/* DESKTOP layout */}
+          <div className={`hidden md:grid gap-2 h-[62vh] ${count > 1 ? 'md:grid-cols-[55fr_45fr]' : ''}`}>
 
-            {/* LEFT — main large image */}
+            {/* Main image */}
             <div
               className="relative rounded-2xl overflow-hidden cursor-pointer group"
               onClick={() => openLightbox(0)}
             >
               <Image
-                src={mainImage}
+                src={img0}
                 alt={alt}
                 fill
-                sizes="55vw"
+                sizes={count > 1 ? '55vw' : '100vw'}
                 className="object-cover group-hover:scale-[1.02] transition-transform duration-700"
                 priority
               />
@@ -273,67 +264,67 @@ export function PropertyGallery({ images, alt, tag }: PropertyGalleryProps) {
                   {tag}
                 </span>
               )}
+              {count === 1 && <ViewAllButton count={count} onClick={() => openLightbox(0)} />}
             </div>
 
-            {/* RIGHT — top wide + bottom 2 small */}
-            <div className="grid grid-rows-[3fr_2fr] gap-2">
+            {/* Right column */}
+            {count > 1 && (
+              <div className={`grid gap-2 ${count > 2 ? 'grid-rows-[3fr_2fr]' : ''}`}>
 
-              {/* Top right — wide image */}
-              <div
-                className="relative rounded-2xl overflow-hidden cursor-pointer group"
-                onClick={() => openLightbox(1)}
-              >
-                <Image
-                  src={topRight}
-                  alt={`${alt} 2`}
-                  fill
-                  sizes="45vw"
-                  className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-[#125DE5]/0 group-hover:bg-[#125DE5]/5 transition-colors duration-300" />
-              </div>
-
-              {/* Bottom right — 2 small images */}
-              <div className="grid grid-cols-2 gap-2">
+                {/* Top right */}
                 <div
                   className="relative rounded-2xl overflow-hidden cursor-pointer group"
-                  onClick={() => openLightbox(2)}
+                  onClick={() => openLightbox(1)}
                 >
                   <Image
-                    src={bottomRight1}
-                    alt={`${alt} 3`}
+                    src={img1}
+                    alt={`${alt} 2`}
                     fill
-                    sizes="22vw"
-                    className="object-cover group-hover:scale-[1.04] transition-transform duration-500"
+                    sizes="45vw"
+                    className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-[#125DE5]/0 group-hover:bg-[#125DE5]/5 transition-colors duration-300" />
+                  {count === 2 && <ViewAllButton count={count} onClick={() => openLightbox(0)} />}
                 </div>
 
-                <div
-                  className="relative rounded-2xl overflow-hidden cursor-pointer group"
-                  onClick={() => openLightbox(3)}
-                >
-                  <Image
-                    src={bottomRight2}
-                    alt={`${alt} 4`}
-                    fill
-                    sizes="22vw"
-                    className="object-cover group-hover:scale-[1.04] transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                  <button
-                    onClick={(e) => { e.stopPropagation(); openLightbox(0) }}
-                    className="absolute inset-0 flex items-end justify-end p-3 z-10"
-                  >
-                    <span className="bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-semibold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-lg hover:bg-white transition-colors">
-                      <Images size={13} className="text-[#125DE5]" />
-                      View all {photoCount} photos
-                    </span>
-                  </button>
-                </div>
+                {/* Bottom row */}
+                {count > 2 && (
+                  <div className={`grid gap-2 ${count > 3 ? 'grid-cols-2' : ''}`}>
+                    <div
+                      className="relative rounded-2xl overflow-hidden cursor-pointer group"
+                      onClick={() => openLightbox(2)}
+                    >
+                      <Image
+                        src={img2}
+                        alt={`${alt} 3`}
+                        fill
+                        sizes="22vw"
+                        className="object-cover group-hover:scale-[1.04] transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-[#125DE5]/0 group-hover:bg-[#125DE5]/5 transition-colors duration-300" />
+                      {count === 3 && <ViewAllButton count={count} onClick={() => openLightbox(0)} />}
+                    </div>
+
+                    {count > 3 && (
+                      <div
+                        className="relative rounded-2xl overflow-hidden cursor-pointer group"
+                        onClick={() => openLightbox(3)}
+                      >
+                        <Image
+                          src={img3}
+                          alt={`${alt} 4`}
+                          fill
+                          sizes="22vw"
+                          className="object-cover group-hover:scale-[1.04] transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                        <ViewAllButton count={count} onClick={() => openLightbox(0)} />
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            </div>
-
+            )}
           </div>
         </div>
       </div>
@@ -341,7 +332,7 @@ export function PropertyGallery({ images, alt, tag }: PropertyGalleryProps) {
       <AnimatePresence>
         {lightboxOpen && (
           <Lightbox
-            images={lightboxImages}
+            images={images}
             initialIndex={lightboxIndex}
             onClose={() => setLightboxOpen(false)}
             title={alt}

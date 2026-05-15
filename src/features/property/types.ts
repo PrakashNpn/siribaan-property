@@ -5,13 +5,8 @@ export interface UnitType {
   bedrooms: number
   bathrooms: number
   areaSqmMin: number
-  areaSqmMax?: number | null
-  priceMin: number
-  priceMax?: number | null
   parking: number
-  floorMin?: number | null
-  floorMax?: number | null
-  available?: number | null
+  images: string[]
   createdAt: Date
   updatedAt: Date
 }
@@ -25,14 +20,18 @@ export interface Property {
   status: string
   tag?: string | null
   featured: boolean
+  developer?: string | null
+  listingType: string
+  projectStatus?: string | null
+  startingPrice?: number | null
   location: string
   address: string
+  mapUrl?: string | null
   nearbyPlaces: string[]
   yearBuilt?: number | null
   completionDate?: string | null
   totalFloors?: number | null
   totalUnits?: number | null
-  landAreaSqm?: number | null
   images: string[]
   amenities: string[]
   unitTypes: UnitType[]

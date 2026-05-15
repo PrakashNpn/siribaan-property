@@ -9,6 +9,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
   }
-  const unitType = await propertyService.createUnitType(id, parsed.data)
-  return NextResponse.json(unitType, { status: 201 })
+  try {
+    const unitType = await propertyService.createUnitType(id, parsed.data)
+    return NextResponse.json(unitType, { status: 201 })
+  } catch {
+    return NextResponse.json({ message: 'Failed to create unit type.' }, { status: 500 })
+  }
 }

@@ -1,7 +1,7 @@
-import { prisma } from '@/lib/prisma'
+import { prisma, withRetry } from '@/lib/prisma'
 import { PropertyFormData, UnitTypeFormData } from '../validation'
 
-const withUnitTypes = { unitTypes: { orderBy: { priceMin: 'asc' as const } } }
+const withUnitTypes = { unitTypes: { orderBy: { areaSqmMin: 'asc' as const } } }
 
 export const propertyRepository = {
   findAll: async (
@@ -17,80 +17,98 @@ export const propertyRepository = {
       ...(filters?.location && { location: { contains: filters.location, mode: 'insensitive' as const } }),
       ...(filters?.type && filters.type !== 'All' && { type: filters.type }),
       ...((filters?.minPrice !== undefined || filters?.maxPrice !== undefined) && {
-        unitTypes: {
-          some: {
-            ...(filters?.minPrice ? { priceMin: { gte: filters.minPrice } } : {}),
-            ...(filters?.maxPrice ? { priceMin: { lte: filters.maxPrice } } : {}),
-          },
-        },
+        ...(filters?.minPrice ? { startingPrice: { gte: filters.minPrice } } : {}),
+        ...(filters?.maxPrice ? { startingPrice: { lte: filters.maxPrice } } : {}),
       }),
     }
 
-    const [properties, total] = await prisma.$transaction([
-      prisma.property.findMany({ where, skip, take: pageSize, orderBy: { createdAt: 'desc' }, include: withUnitTypes }),
-      prisma.property.count({ where }),
-    ])
-
-    return { properties, total, page, pageSize, totalPages: Math.ceil(total / pageSize) }
+    return withRetry(async () => {
+      const [properties, total] = await prisma.$transaction([
+        prisma.property.findMany({ where, skip, take: pageSize, orderBy: { createdAt: 'desc' }, include: withUnitTypes }),
+        prisma.property.count({ where }),
+      ])
+      return { properties, total, page, pageSize, totalPages: Math.ceil(total / pageSize) }
+    })
   },
 
-  findById: async (id: string) => {
-    return prisma.property.findUnique({ where: { id }, include: withUnitTypes })
-  },
+  findById: async (id: string) =>
+    withRetry(() => prisma.property.findUnique({ where: { id }, include: withUnitTypes })),
 
-  findFeatured: async (limit = 4) => {
-    return prisma.property.findMany({
+  findBySlug: async (slug: string) =>
+    withRetry(() => prisma.property.findUnique({ where: { slug }, include: withUnitTypes })),
+
+  findFeatured: async (limit = 4) =>
+    withRetry(() => prisma.property.findMany({
       where: { status: 'active', featured: true },
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: withUnitTypes,
-    })
-  },
+    })),
 
-  findRecommended: async (excludeId: string, limit = 3) => {
-    return prisma.property.findMany({
+  findRecommended: async (excludeId: string, limit = 3) =>
+    withRetry(() => prisma.property.findMany({
       where: { status: 'active', id: { not: excludeId } },
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: withUnitTypes,
-    })
-  },
+    })),
 
-  create: async (data: PropertyFormData) => {
-    return prisma.property.create({ data, include: withUnitTypes })
-  },
+  create: async (data: PropertyFormData) =>
+    withRetry(() => prisma.property.create({ data, include: withUnitTypes })),
 
-  createWithUnitTypes: async (data: PropertyFormData, unitTypes: UnitTypeFormData[]) => {
-    return prisma.property.create({
+  createWithUnitTypes: async (data: PropertyFormData, unitTypes: UnitTypeFormData[]) =>
+    withRetry(() => prisma.property.create({
       data: {
         ...data,
         unitTypes: unitTypes.length > 0 ? { create: unitTypes } : undefined,
       },
       include: withUnitTypes,
-    })
+    })),
+
+  update: async (id: string, data: Partial<PropertyFormData>) =>
+    withRetry(() => prisma.property.update({ where: { id }, data, include: withUnitTypes })),
+
+  delete: async (id: string) =>
+    withRetry(() => prisma.property.delete({ where: { id } })),
+
+  findAllAdmin: async (filters?: { search?: string; status?: string; type?: string; sort?: string }) => {
+    const where = {
+      ...(filters?.search && {
+        OR: [
+          { title: { contains: filters.search, mode: 'insensitive' as const } },
+          { location: { contains: filters.search, mode: 'insensitive' as const } },
+        ],
+      }),
+      ...(filters?.status && filters.status !== 'all' && { status: filters.status }),
+      ...(filters?.type && filters.type !== 'all' && { type: filters.type }),
+    }
+    const orderBy =
+      filters?.sort === 'oldest' ? { createdAt: 'asc' as const }
+      : filters?.sort === 'title-asc' ? { title: 'asc' as const }
+      : { createdAt: 'desc' as const }
+
+    const results = await withRetry(() => prisma.property.findMany({ where, orderBy, include: withUnitTypes }))
+
+    if (filters?.sort === 'price-asc' || filters?.sort === 'price-desc') {
+      const dir = filters.sort === 'price-asc' ? 1 : -1
+      return results.sort((a, b) => {
+        const aPrice = a.startingPrice ?? 0
+        const bPrice = b.startingPrice ?? 0
+        return (aPrice - bPrice) * dir
+      })
+    }
+    return results
   },
 
-  update: async (id: string, data: Partial<PropertyFormData>) => {
-    return prisma.property.update({ where: { id }, data, include: withUnitTypes })
-  },
+  createUnitType: async (propertyId: string, data: UnitTypeFormData) =>
+    withRetry(() => prisma.unitType.create({ data: { ...data, propertyId } })),
 
-  delete: async (id: string) => {
-    return prisma.property.delete({ where: { id } })
-  },
+  getUnitTypeById: async (id: string) =>
+    withRetry(() => prisma.unitType.findUnique({ where: { id } })),
 
-  findAllAdmin: async () => {
-    return prisma.property.findMany({ orderBy: { createdAt: 'desc' }, include: withUnitTypes })
-  },
+  updateUnitType: async (id: string, data: Partial<UnitTypeFormData>) =>
+    withRetry(() => prisma.unitType.update({ where: { id }, data })),
 
-  createUnitType: async (propertyId: string, data: UnitTypeFormData) => {
-    return prisma.unitType.create({ data: { ...data, propertyId } })
-  },
-
-  updateUnitType: async (id: string, data: Partial<UnitTypeFormData>) => {
-    return prisma.unitType.update({ where: { id }, data })
-  },
-
-  deleteUnitType: async (id: string) => {
-    return prisma.unitType.delete({ where: { id } })
-  },
+  deleteUnitType: async (id: string) =>
+    withRetry(() => prisma.unitType.delete({ where: { id } })),
 }

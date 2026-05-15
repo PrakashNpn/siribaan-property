@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Cormorant_Garamond } from 'next/font/google'
+import { Toaster } from 'sonner'
+import NextTopLoader from 'nextjs-toploader'
 import { organizationJsonLd } from '@/lib/jsonld'
 import './globals.css'
 
@@ -52,11 +54,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.variable} ${cormorant.variable} ${inter.className}`}>
+        <NextTopLoader color="#125DE5" height={3} showSpinner={false} easing="ease" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
         {children}
+        <Toaster position="bottom-right" richColors />
       </body>
     </html>
   )

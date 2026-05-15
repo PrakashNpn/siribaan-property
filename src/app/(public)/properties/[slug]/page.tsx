@@ -3,7 +3,10 @@ export const dynamic = 'force-dynamic'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { MapPin, Bed, Bath, Square, Car, CheckCircle, ExternalLink, ArrowRight, ChevronRight, Building2, Layers, CalendarDays, Home, TreePine } from 'lucide-react'
+import Image from 'next/image'
+import { MapPin, Bed, Bath, Square, ArrowRight, ChevronRight, Building2, Layers, CalendarDays, Home, Check, Tag } from 'lucide-react'
+import { DescriptionExpander } from './description-expander'
+import { UnitTypeTabs } from './unit-type-tabs'
 import { propertyService } from '@/features/property/server/property.service'
 import { InquiryForm } from '@/features/inquiry/components/inquiry-form'
 import { PropertyCard } from '@/features/property/components/property-card'
@@ -13,14 +16,14 @@ import { formatPrice } from '@/lib/utils'
 import { AnimateIn, AnimateInView } from '@/components/animate-in'
 import { propertyJsonLd, breadcrumbJsonLd } from '@/lib/jsonld'
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const { id } = await params
-  const property = await propertyService.getById(id)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const property = await propertyService.getBySlug(slug)
   if (!property) return {}
   return {
     title: property.title,
     description: property.description.slice(0, 155),
-    alternates: { canonical: `/properties/${id}` },
+    alternates: { canonical: `/properties/${slug}` },
     openGraph: {
       title: property.title,
       description: property.description.slice(0, 155),
@@ -30,23 +33,21 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 }
 
-export default async function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+export default async function PropertyDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
   const [property, recommended] = await Promise.all([
-    propertyService.getById(id),
-    propertyService.getRecommended(id, 3),
+    propertyService.getBySlug(slug),
+    propertyService.getBySlug(slug).then((p) => p ? propertyService.getRecommended(p.id, 3) : []),
   ])
 
   if (!property) notFound()
 
-  const startingPrice = property.unitTypes.length > 0
-    ? Math.min(...property.unitTypes.map((u) => u.priceMin))
-    : null
+  const startingPrice = property.startingPrice ?? null
 
   const bedroomSet = [...new Set(property.unitTypes.map(u => u.bedrooms))].sort((a, b) => a - b)
   const bathroomSet = [...new Set(property.unitTypes.map(u => u.bathrooms))].sort((a, b) => a - b)
   const areaMin = property.unitTypes.length > 0 ? Math.min(...property.unitTypes.map(u => u.areaSqmMin)) : null
-  const areaMax = property.unitTypes.length > 0 ? Math.max(...property.unitTypes.map(u => u.areaSqmMax ?? u.areaSqmMin)) : null
+  const areaMax = property.unitTypes.length > 0 ? Math.max(...property.unitTypes.map(u => u.areaSqmMin)) : null
 
   const formatRange = (values: number[], suffix = '') => {
     if (values.length === 0) return '—'
@@ -69,7 +70,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             breadcrumbJsonLd([
               { name: 'Home', url: BASE },
               { name: 'Properties', url: `${BASE}/properties` },
-              { name: property.title, url: `${BASE}/properties/${property.id}` },
+              { name: property.title, url: `${BASE}/properties/${property.slug}` },
             ])
           ),
         }}
@@ -117,7 +118,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                 <div>
                   <div className="flex items-center gap-1.5 text-gray-500 mb-3">
                     <MapPin size={14} className="text-[#125DE5] shrink-0" />
-                    <span className="text-sm">{property.address}</span>
+                    <span className="text-sm">{property.location}</span>
                   </div>
                   <h1
                     className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#125DE5] mb-5 leading-tight"
@@ -126,61 +127,67 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                   </h1>
 
                   {/* Stat pills */}
-                  <div className="flex flex-wrap gap-2 sm:gap-2.5 mb-5">
+                  <div className="flex flex-wrap gap-2 mb-5">
                     {bedroomSet.length > 0 && (
-                      <div className="flex items-center gap-2.5 bg-white/70 backdrop-blur-sm border border-blue-100/70 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 shadow-[0_2px_16px_rgba(18,93,229,0.07)]">
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#125DE5]/10 flex items-center justify-center shrink-0">
-                          <Bed size={13} className="text-[#125DE5]" />
-                        </div>
+                      <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 bg-white/60">
+                        <Bed size={13} className="text-[#125DE5] shrink-0" />
                         <div>
-                          <p className="text-sm font-bold text-gray-900 leading-none mb-0.5">{formatRange(bedroomSet)}</p>
-                          <p className="text-[10px] uppercase tracking-widest text-gray-400 leading-none">Bedrooms</p>
+                          <p className="text-[9px] uppercase tracking-widest text-gray-400 leading-none mb-1">Bedrooms</p>
+                          <p className="text-xs font-bold text-gray-900 leading-none">{formatRange(bedroomSet)}</p>
                         </div>
                       </div>
                     )}
                     {bathroomSet.length > 0 && (
-                      <div className="flex items-center gap-2.5 bg-white/70 backdrop-blur-sm border border-blue-100/70 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 shadow-[0_2px_16px_rgba(18,93,229,0.07)]">
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#125DE5]/10 flex items-center justify-center shrink-0">
-                          <Bath size={13} className="text-[#125DE5]" />
-                        </div>
+                      <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 bg-white/60">
+                        <Bath size={13} className="text-[#125DE5] shrink-0" />
                         <div>
-                          <p className="text-sm font-bold text-gray-900 leading-none mb-0.5">{formatRange(bathroomSet)}</p>
-                          <p className="text-[10px] uppercase tracking-widest text-gray-400 leading-none">Bathrooms</p>
+                          <p className="text-[9px] uppercase tracking-widest text-gray-400 leading-none mb-1">Bathrooms</p>
+                          <p className="text-xs font-bold text-gray-900 leading-none">{formatRange(bathroomSet)}</p>
                         </div>
                       </div>
                     )}
                     {areaMin !== null && (
-                      <div className="flex items-center gap-2.5 bg-white/70 backdrop-blur-sm border border-blue-100/70 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 shadow-[0_2px_16px_rgba(18,93,229,0.07)]">
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#125DE5]/10 flex items-center justify-center shrink-0">
-                          <Square size={13} className="text-[#125DE5]" />
-                        </div>
+                      <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 bg-white/60">
+                        <Square size={13} className="text-[#125DE5] shrink-0" />
                         <div>
-                          <p className="text-sm font-bold text-gray-900 leading-none mb-0.5">
+                          <p className="text-[9px] uppercase tracking-widest text-gray-400 leading-none mb-1">Floor Area</p>
+                          <p className="text-xs font-bold text-gray-900 leading-none">
                             {areaMin === areaMax ? `${areaMin}` : `${areaMin}–${areaMax}`} m²
                           </p>
-                          <p className="text-[10px] uppercase tracking-widest text-gray-400 leading-none">Floor Area</p>
                         </div>
                       </div>
                     )}
-                    <div className="flex items-center gap-2.5 bg-white/70 backdrop-blur-sm border border-blue-100/70 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 shadow-[0_2px_16px_rgba(18,93,229,0.07)]">
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#125DE5]/10 flex items-center justify-center shrink-0">
-                        <Home size={13} className="text-[#125DE5]" />
-                      </div>
+                    <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 bg-white/60">
+                      <Home size={13} className="text-[#125DE5] shrink-0" />
                       <div>
-                        <p className="text-sm font-bold text-gray-900 leading-none mb-0.5">{property.type}</p>
-                        <p className="text-[10px] uppercase tracking-widest text-gray-400 leading-none">Property Type</p>
+                        <p className="text-[9px] uppercase tracking-widest text-gray-400 leading-none mb-1">Property Type</p>
+                        <p className="text-xs font-bold text-gray-900 leading-none">{property.type}</p>
                       </div>
                     </div>
-                    {startingPrice !== null && areaMin !== null && (
-                      <div className="flex items-center gap-2.5 bg-white/70 backdrop-blur-sm border border-blue-100/70 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 shadow-[0_2px_16px_rgba(18,93,229,0.07)]">
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#125DE5]/10 flex items-center justify-center shrink-0">
-                          <span className="text-[#125DE5] text-xs font-bold">฿</span>
-                        </div>
+                    {property.listingType && (
+                      <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 bg-white/60">
+                        <Tag size={13} className="text-[#125DE5] shrink-0" />
                         <div>
-                          <p className="text-sm font-bold text-gray-900 leading-none mb-0.5">
-                            ฿{formatPrice(Math.round(startingPrice / areaMin))}/m²
-                          </p>
-                          <p className="text-[10px] uppercase tracking-widest text-gray-400 leading-none">From Price/m²</p>
+                          <p className="text-[9px] uppercase tracking-widest text-gray-400 leading-none mb-1">For</p>
+                          <p className="text-xs font-bold text-gray-900 leading-none">{property.listingType}</p>
+                        </div>
+                      </div>
+                    )}
+                    {property.developer && (
+                      <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 bg-white/60">
+                        <Building2 size={13} className="text-[#125DE5] shrink-0" />
+                        <div>
+                          <p className="text-[9px] uppercase tracking-widest text-gray-400 leading-none mb-1">Developer</p>
+                          <p className="text-xs font-bold text-gray-900 leading-none">{property.developer}</p>
+                        </div>
+                      </div>
+                    )}
+                    {property.projectStatus && (
+                      <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 bg-white/60">
+                        <CalendarDays size={13} className="text-[#125DE5] shrink-0" />
+                        <div>
+                          <p className="text-[9px] uppercase tracking-widest text-gray-400 leading-none mb-1">Status</p>
+                          <p className="text-xs font-bold text-gray-900 leading-none">{property.projectStatus}</p>
                         </div>
                       </div>
                     )}
@@ -201,14 +208,12 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                       <span className="w-6 h-px bg-[#125DE5] inline-block" />
                       Property Overview
                     </h2>
-                    <div className="space-y-4 mb-6">
-                      {property.description.split('\n\n').map((para, i) => (
-                        <p key={i} className="text-gray-600 leading-relaxed text-sm sm:text-base">{para}</p>
-                      ))}
+                    <div className="mb-6">
+                      <DescriptionExpander text={property.description} />
                     </div>
 
                     {/* Property details grid */}
-                    {(property.totalFloors || property.totalUnits || property.yearBuilt || property.completionDate || property.landAreaSqm) && (
+                    {(property.totalFloors || property.totalUnits || property.yearBuilt || property.completionDate) && (
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
                         {property.totalFloors && (
                           <div className="bg-white/60 border border-white/80 rounded-xl px-3 sm:px-4 py-3 flex items-center gap-2 sm:gap-3">
@@ -246,19 +251,30 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                             </div>
                           </div>
                         )}
-                        {property.landAreaSqm && (
-                          <div className="bg-white/60 border border-white/80 rounded-xl px-3 sm:px-4 py-3 flex items-center gap-2 sm:gap-3">
-                            <TreePine size={14} className="text-[#125DE5] shrink-0" />
-                            <div>
-                              <p className="text-gray-900 text-sm font-semibold">{property.landAreaSqm} m²</p>
-                              <p className="text-gray-400 text-[10px] uppercase tracking-wide">Land Area</p>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>
                 </AnimateInView>
+
+                {/* Amenities */}
+                {property.amenities.length > 0 && (
+                  <AnimateInView delay={0} direction="up">
+                    <div>
+                      <h2 className="text-xs font-bold uppercase tracking-widest text-[#125DE5] mb-4 flex items-center gap-2">
+                        <span className="w-6 h-px bg-[#125DE5] inline-block" />
+                        Facilities &amp; Amenities
+                      </h2>
+                      <div className="columns-2 sm:columns-3 gap-x-8">
+                        {property.amenities.map((amenity) => (
+                          <div key={amenity} className="flex items-center gap-2.5 py-2 break-inside-avoid">
+                            <Check size={13} className="text-[#125DE5] shrink-0" strokeWidth={2.5} />
+                            <span className="text-gray-600 text-sm">{amenity}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </AnimateInView>
+                )}
 
                 {/* Unit Types */}
                 {property.unitTypes.length > 0 && (
@@ -268,94 +284,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                         <span className="w-6 h-px bg-[#125DE5] inline-block" />
                         Available Unit Types
                       </h2>
-                      <div className="space-y-3">
-                        {property.unitTypes.map((unit, i) => (
-                          <div
-                            key={unit.id}
-                            className="bg-white/70 backdrop-blur-sm border border-blue-100/70 rounded-2xl shadow-[0_2px_16px_rgba(18,93,229,0.06)] overflow-hidden"
-                          >
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:divide-x divide-gray-100/80">
-                              {/* Identity */}
-                              <div className="flex items-center gap-4 pl-0 pr-4 sm:pr-6 py-4 sm:py-5 sm:min-w-[180px]">
-                                <div className="w-1 self-stretch bg-[#125DE5] rounded-r-full shrink-0" />
-                                <span className="text-3xl sm:text-4xl font-bold text-gray-200 leading-none select-none shrink-0">
-                                  {String(i + 1).padStart(2, '0')}
-                                </span>
-                                <div>
-                                  <p className="text-sm font-bold text-gray-900 leading-snug">{unit.name}</p>
-                                  {unit.parking > 0 && (
-                                    <p className="text-[11px] text-gray-400 flex items-center gap-1 mt-1">
-                                      <Car size={10} /> {unit.parking} parking
-                                    </p>
-                                  )}
-                                  {unit.floorMin && (
-                                    <p className="text-[11px] text-gray-400 flex items-center gap-1 mt-0.5">
-                                      <Layers size={10} /> Fl. {unit.floorMax && unit.floorMax !== unit.floorMin ? `${unit.floorMin}–${unit.floorMax}` : unit.floorMin}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Stats chips */}
-                              <div className="flex items-center gap-2 px-4 sm:px-5 py-3 sm:py-5 flex-1 flex-wrap border-t border-gray-100/80 sm:border-t-0">
-                                <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-100/60 rounded-xl px-3 py-2">
-                                  <Bed size={12} className="text-[#125DE5]" />
-                                  <span className="text-xs font-bold text-gray-800">{unit.bedrooms}</span>
-                                  <span className="text-[10px] text-gray-400 uppercase tracking-wide">Bed</span>
-                                </div>
-                                <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-100/60 rounded-xl px-3 py-2">
-                                  <Bath size={12} className="text-[#125DE5]" />
-                                  <span className="text-xs font-bold text-gray-800">{unit.bathrooms}</span>
-                                  <span className="text-[10px] text-gray-400 uppercase tracking-wide">Bath</span>
-                                </div>
-                                <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-100/60 rounded-xl px-3 py-2">
-                                  <Square size={12} className="text-[#125DE5]" />
-                                  <span className="text-xs font-bold text-gray-800">
-                                    {unit.areaSqmMax && unit.areaSqmMax !== unit.areaSqmMin
-                                      ? `${unit.areaSqmMin}–${unit.areaSqmMax}`
-                                      : unit.areaSqmMin}
-                                  </span>
-                                  <span className="text-[10px] text-gray-400 uppercase tracking-wide">m²</span>
-                                </div>
-                              </div>
-
-                              {/* Price */}
-                              <div className="px-4 sm:px-6 py-3 sm:py-5 sm:text-right sm:min-w-[160px] sm:shrink-0 border-t border-gray-100/80 sm:border-t-0">
-                                <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">From</p>
-                                <p className="text-lg font-bold text-[#125DE5] leading-tight">฿{formatPrice(unit.priceMin)}</p>
-                                {unit.priceMax && (
-                                  <p className="text-[10px] text-gray-400 mt-1.5">up to ฿{formatPrice(unit.priceMax)}</p>
-                                )}
-                                <div className="mt-2 pt-2 border-t border-gray-100">
-                                  <p className="text-[10px] text-gray-400">฿{formatPrice(Math.round(unit.priceMin / unit.areaSqmMin))}/m²</p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </AnimateInView>
-                )}
-
-                {/* Amenities */}
-                {property.amenities.length > 0 && (
-                  <AnimateInView delay={0} direction="up">
-                    <div>
-                      <h2 className="text-xs font-bold uppercase tracking-widest text-[#125DE5] mb-4 flex items-center gap-2">
-                        <span className="w-6 h-px bg-[#125DE5] inline-block" />
-                        Facilities
-                      </h2>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {property.amenities.map((amenity) => (
-                          <div key={amenity} className="flex items-center gap-3 sm:gap-4 bg-white/70 backdrop-blur-sm rounded-2xl px-4 py-3.5 border border-blue-100/70 shadow-[0_2px_12px_rgba(18,93,229,0.05)]">
-                            <div className="w-8 h-8 rounded-full bg-[#125DE5]/10 flex items-center justify-center shrink-0">
-                              <CheckCircle size={15} className="text-[#125DE5]" />
-                            </div>
-                            <span className="text-gray-700 text-sm font-medium">{amenity}</span>
-                          </div>
-                        ))}
-                      </div>
+                      <UnitTypeTabs unitTypes={property.unitTypes} />
                     </div>
                   </AnimateInView>
                 )}
@@ -382,27 +311,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                       </div>
                     )}
 
-                    <MapEmbed address={property.address} height="h-64 sm:h-80" />
-
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mt-4 bg-white/70 backdrop-blur-sm border border-blue-100/70 rounded-2xl px-4 sm:px-5 py-4 shadow-[0_2px_12px_rgba(18,93,229,0.05)]">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#125DE5]/10 flex items-center justify-center shrink-0 mt-0.5">
-                          <MapPin size={14} className="text-[#125DE5]" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-gray-800">{property.location}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">{property.address}</p>
-                        </div>
-                      </div>
-                      <a
-                        href={`https://maps.google.com/?q=${encodeURIComponent(property.address)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 bg-[#125DE5] hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shrink-0"
-                      >
-                        Open in Maps <ExternalLink size={12} />
-                      </a>
-                    </div>
+                    <MapEmbed address={property.address} mapUrl={property.mapUrl} height="h-64 sm:h-80" />
                   </div>
                 </AnimateInView>
 

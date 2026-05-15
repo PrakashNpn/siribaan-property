@@ -17,12 +17,16 @@ model Property {
   featured       Boolean    @default(false)
   location       String
   address        String
+  mapUrl         String?
   nearbyPlaces   String[]
+  developer      String?
+  listingType    String   @default("Sale")
+  projectStatus  String?
+  startingPrice  Float?
   yearBuilt      Int?
   completionDate String?
   totalFloors    Int?
   totalUnits     Int?
-  landAreaSqm    Float?
   images         String[]
   amenities      String[]
   unitTypes      UnitType[]
@@ -39,13 +43,8 @@ model UnitType {
   bedrooms   Int
   bathrooms  Int
   areaSqmMin Float
-  areaSqmMax Float?
-  priceMin   Float
-  priceMax   Float?
   parking    Int      @default(1)
-  floorMin   Int?
-  floorMax   Int?
-  available  Int?
+  images     String[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -58,5 +57,6 @@ model Inquiry {
   message    String
   propertyId String?
   property   Property? @relation(fields: [propertyId], references: [id])
+  read       Boolean   @default(false)
   createdAt  DateTime  @default(now())
 }

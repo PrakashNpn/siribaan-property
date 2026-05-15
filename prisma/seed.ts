@@ -19,6 +19,10 @@ async function main() {
       status: 'active',
       tag: 'NEW LISTING',
       featured: true,
+      developer: 'Lumina Development',
+      listingType: 'Sale',
+      projectStatus: 'Completed',
+      startingPrice: 95000000,
       location: 'Sukhumvit 24, Bangkok',
       address: 'Sukhumvit 24, Khlong Toei, Bangkok 10110',
       nearbyPlaces: ['BTS Phrom Phong (500m)', 'Emporium Mall (300m)', 'Benjakiti Park (800m)'],
@@ -31,8 +35,8 @@ async function main() {
   })
   await prisma.unitType.createMany({
     data: [
-      { propertyId: p1.id, name: '3 Bedroom', bedrooms: 3, bathrooms: 3, areaSqmMin: 280, areaSqmMax: 320, priceMin: 95000000, priceMax: 120000000, parking: 2 },
-      { propertyId: p1.id, name: 'Penthouse', bedrooms: 4, bathrooms: 5, areaSqmMin: 450, priceMin: 145000000, parking: 3 },
+      { propertyId: p1.id, name: '3 Bedroom', bedrooms: 3, bathrooms: 3, areaSqmMin: 280, parking: 2, images: [] },
+      { propertyId: p1.id, name: 'Penthouse', bedrooms: 4, bathrooms: 5, areaSqmMin: 450, parking: 3, images: [] },
     ],
   })
 
@@ -45,6 +49,9 @@ async function main() {
       status: 'active',
       tag: 'EXCLUSIVE',
       featured: true,
+      listingType: 'Sale',
+      projectStatus: 'Completed',
+      startingPrice: 320000000,
       location: 'Riverside, Bangkok',
       address: 'Charoen Nakhon Rd, Khlong San, Bangkok',
       nearbyPlaces: ['BTS Krung Thon Buri (1km)', 'ICONSIAM (500m)', 'Chao Phraya River'],
@@ -55,7 +62,7 @@ async function main() {
     },
   })
   await prisma.unitType.create({
-    data: { propertyId: p2.id, name: 'Full Estate', bedrooms: 5, bathrooms: 6, areaSqmMin: 820, priceMin: 320000000, parking: 4 },
+    data: { propertyId: p2.id, name: 'Full Estate', bedrooms: 5, bathrooms: 6, areaSqmMin: 820, parking: 4, images: [] },
   })
 
   const p3 = await prisma.property.create({
@@ -67,6 +74,10 @@ async function main() {
       status: 'active',
       tag: 'EXCLUSIVE',
       featured: true,
+      developer: 'Ritz-Carlton Hotel Company',
+      listingType: 'Sale',
+      projectStatus: 'Completed',
+      startingPrice: 85000000,
       location: 'Sukhumvit, Bangkok',
       address: '252 Sukhumvit Rd, Khlong Toei, Bangkok',
       nearbyPlaces: ['BTS Asok (200m)', 'Terminal 21 (300m)', 'Sukhumvit Road'],
@@ -79,8 +90,8 @@ async function main() {
   })
   await prisma.unitType.createMany({
     data: [
-      { propertyId: p3.id, name: '2 Bedroom', bedrooms: 2, bathrooms: 2, areaSqmMin: 140, areaSqmMax: 180, priceMin: 85000000, priceMax: 110000000, parking: 1 },
-      { propertyId: p3.id, name: '3 Bedroom', bedrooms: 3, bathrooms: 4, areaSqmMin: 280, priceMin: 145000000, parking: 2 },
+      { propertyId: p3.id, name: '2 Bedroom', bedrooms: 2, bathrooms: 2, areaSqmMin: 140, parking: 1, images: [] },
+      { propertyId: p3.id, name: '3 Bedroom', bedrooms: 3, bathrooms: 4, areaSqmMin: 280, parking: 2, images: [] },
     ],
   })
 
@@ -93,6 +104,9 @@ async function main() {
       status: 'active',
       tag: 'HOT LISTING',
       featured: false,
+      listingType: 'Sale',
+      projectStatus: 'Completed',
+      startingPrice: 210000000,
       location: 'Thong Lo, Bangkok',
       address: 'Sukhumvit 55, Thong Lo, Bangkok',
       nearbyPlaces: ['BTS Thong Lo (600m)', 'J Avenue (400m)', 'Ekkamai Road'],
@@ -104,7 +118,7 @@ async function main() {
     },
   })
   await prisma.unitType.create({
-    data: { propertyId: p4.id, name: 'Full Villa', bedrooms: 5, bathrooms: 6, areaSqmMin: 520, priceMin: 210000000, parking: 3 },
+    data: { propertyId: p4.id, name: 'Full Villa', bedrooms: 5, bathrooms: 6, areaSqmMin: 520, parking: 3, images: [] },
   })
 
   const p5 = await prisma.property.create({
@@ -116,20 +130,24 @@ async function main() {
       status: 'active',
       tag: 'RIVERSIDE',
       featured: false,
+      developer: 'Aman Resorts',
+      listingType: 'Sale',
+      projectStatus: 'Under Construction',
+      startingPrice: 38000000,
       location: 'Riverside, Bangkok',
       address: 'Charoen Krung Rd, Bang Rak, Bangkok',
       nearbyPlaces: ['BTS Saphan Taksin (1.2km)', 'Mandarin Oriental (500m)', 'Chao Phraya River'],
       yearBuilt: 2023,
       totalFloors: 32,
       totalUnits: 52,
-      images: ['https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=80', 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=80' ],
+      images: ['https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=80', 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=80'],
       amenities: ['24/7 Elite Concierge Service', 'Smart-Home Central Integration', 'Direct Elevator Access', 'Private Gym & Spa'],
     },
   })
   await prisma.unitType.createMany({
     data: [
-      { propertyId: p5.id, name: '1 Bedroom', bedrooms: 1, bathrooms: 1, areaSqmMin: 80, areaSqmMax: 100, priceMin: 38000000, priceMax: 50000000, parking: 1 },
-      { propertyId: p5.id, name: '2 Bedroom', bedrooms: 2, bathrooms: 3, areaSqmMin: 165, priceMin: 88000000, parking: 1 },
+      { propertyId: p5.id, name: '1 Bedroom', bedrooms: 1, bathrooms: 1, areaSqmMin: 80, parking: 1, images: [] },
+      { propertyId: p5.id, name: '2 Bedroom', bedrooms: 2, bathrooms: 3, areaSqmMin: 165, parking: 1, images: [] },
     ],
   })
 
@@ -142,6 +160,9 @@ async function main() {
       status: 'active',
       tag: 'EXCLUSIVE',
       featured: false,
+      listingType: 'Sale',
+      projectStatus: 'Completed',
+      startingPrice: 89500000,
       location: 'Phrom Phong, Bangkok',
       address: 'Sukhumvit 39, Phrom Phong, Bangkok',
       nearbyPlaces: ['BTS Phrom Phong (400m)', 'Emquartier (600m)', 'Benjasiri Park (300m)'],
@@ -153,7 +174,7 @@ async function main() {
     },
   })
   await prisma.unitType.create({
-    data: { propertyId: p6.id, name: 'Full Villa', bedrooms: 4, bathrooms: 4, areaSqmMin: 320, priceMin: 89500000, parking: 2 },
+    data: { propertyId: p6.id, name: 'Full Villa', bedrooms: 4, bathrooms: 4, areaSqmMin: 320, parking: 2, images: [] },
   })
 
   console.log('Done seeding!')
