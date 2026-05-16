@@ -36,6 +36,7 @@ export const unitTypeSchema = z.object({
   bedrooms: z.number().int().min(0),
   bathrooms: z.number().int().min(0),
   areaSqmMin: z.number().positive('Area must be positive'),
+  areaSqmMax: z.number().positive().optional().nullable(),
   parking: z.number().int().min(0),
   images: z.array(z.string()),
 })

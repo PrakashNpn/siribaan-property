@@ -52,7 +52,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
       <body className={`${inter.variable} ${cormorant.variable} ${inter.className}`}>
         <NextTopLoader color="#125DE5" height={3} showSpinner={false} easing="ease" />
         <script

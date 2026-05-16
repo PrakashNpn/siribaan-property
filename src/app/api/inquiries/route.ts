@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
   // Send email notification (only if RESEND_API_KEY is configured)
   if (resend && process.env.INQUIRY_EMAIL_TO) {
     const { name, email, phone, message, preferredDate, propertyId } = parsed.data
+    const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
     await resend.emails.send({
       from: 'Siribaan Website <onboarding@resend.dev>',
       to: process.env.INQUIRY_EMAIL_TO,
@@ -29,16 +30,17 @@ export async function POST(request: NextRequest) {
           </div>
           <div style="background: #f9fafb; padding: 32px; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px;">
             <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 13px; width: 130px;">Name</td><td style="padding: 8px 0; font-weight: 600; color: #111827;">${name}</td></tr>
-              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 13px;">Email</td><td style="padding: 8px 0; font-weight: 600; color: #111827;"><a href="mailto:${email}" style="color: #1d4ed8;">${email}</a></td></tr>
-              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 13px;">Phone</td><td style="padding: 8px 0; font-weight: 600; color: #111827;">${phone}</td></tr>
-              ${preferredDate ? `<tr><td style="padding: 8px 0; color: #6b7280; font-size: 13px;">Preferred Date</td><td style="padding: 8px 0; font-weight: 600; color: #111827;">${preferredDate}</td></tr>` : ''}
-              ${propertyId ? `<tr><td style="padding: 8px 0; color: #6b7280; font-size: 13px;">Property ID</td><td style="padding: 8px 0; font-weight: 600; color: #111827;">${propertyId}</td></tr>` : ''}
+              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 13px; width: 130px;">Name</td><td style="padding: 8px 0; font-weight: 600; color: #111827;">${esc(name)}</td></tr>
+              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 13px;">Email</td><td style="padding: 8px 0; font-weight: 600; color: #111827;"><a href="mailto:${esc(email)}" style="color: #1d4ed8;">${esc(email)}</a></td></tr>
+              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 13px;">Phone</td><td style="padding: 8px 0; font-weight: 600; color: #111827;">${esc(phone)}</td></tr>
+              ${preferredDate ? `<tr><td style="padding: 8px 0; color: #6b7280; font-size: 13px;">Preferred Date</td><td style="padding: 8px 0; font-weight: 600; color: #111827;">${esc(preferredDate)}</td></tr>` : ''}
+              ${propertyId ? `<tr><td style="padding: 8px 0; color: #6b7280; font-size: 13px;">Property ID</td><td style="padding: 8px 0; font-weight: 600; color: #111827;">${esc(propertyId)}</td></tr>` : ''}
             </table>
+            ${message ? `
             <div style="margin-top: 20px; padding: 16px; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
               <p style="color: #6b7280; font-size: 13px; margin: 0 0 6px;">Message</p>
-              <p style="color: #111827; margin: 0; line-height: 1.6;">${message}</p>
-            </div>
+              <p style="color: #111827; margin: 0; line-height: 1.6;">${esc(message)}</p>
+            </div>` : ''}
           </div>
         </div>
       `,

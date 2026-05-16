@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Suspense } from 'react'
-import { Plus, Pencil, Eye, Building2, MapPin } from 'lucide-react'
+import { Plus, Pencil, Eye, Building2, MapPin, ChevronLeft, ChevronRight } from 'lucide-react'
 import { propertyService } from '@/features/property/server/property.service'
 import { formatPrice } from '@/lib/utils'
 import { DeletePropertyButton } from './delete-button'
@@ -10,7 +10,7 @@ import { AdminFilters } from './admin-filters'
 
 export const dynamic = 'force-dynamic'
 
-interface SearchParams { search?: string; status?: string; type?: string; sort?: string }
+interface SearchParams { search?: string; status?: string; type?: string; sort?: string; page?: string }
 
 const TYPE_COLORS: Record<string, string> = {
   Villa:     'bg-amber-50 text-amber-700 border-amber-100',
@@ -22,12 +22,11 @@ const TYPE_COLORS: Record<string, string> = {
 
 export default async function AdminPropertiesPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const sp = await searchParams
-  const properties = await propertyService.getAllAdmin({
-    search: sp.search,
-    status: sp.status,
-    type: sp.type,
-    sort: sp.sort,
-  })
+  const page = Math.max(1, parseInt(sp.page ?? '1'))
+  const { properties, total, totalPages } = await propertyService.getAllAdmin(
+    { search: sp.search, status: sp.status, type: sp.type, sort: sp.sort },
+    { page, pageSize: 20 }
+  )
 
   const activeCount = properties.filter((p) => p.status === 'active').length
   const featuredCount = properties.filter((p) => p.featured).length
@@ -44,7 +43,7 @@ export default async function AdminPropertiesPage({ searchParams }: { searchPara
           <h1 className="text-3xl font-semibold text-gray-900 leading-tight" style={{ fontFamily: 'var(--font-display)' }}>Properties</h1>
           <div className="w-8 h-0.5 bg-amber-400 mt-2 mb-2" />
           <p className="text-sm text-gray-400">
-            {properties.length} {sp.search || sp.status || sp.type ? 'results' : 'total'}
+            {total} {sp.search || sp.status || sp.type ? 'results' : 'total'}
             {!sp.search && !sp.status && !sp.type && (
               <> &middot; {activeCount} active &middot; {featuredCount} featured</>
             )}
@@ -170,6 +169,31 @@ export default async function AdminPropertiesPage({ searchParams }: { searchPara
                 </div>
               )
             })}
+          </div>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-6">
+          <p className="text-xs text-gray-400">Page {page} of {totalPages}</p>
+          <div className="flex items-center gap-2">
+            {page > 1 && (
+              <Link
+                href={{ query: { ...sp, page: page - 1 } }}
+                className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-[#125DE5] border border-gray-200 hover:border-[#125DE5] px-3 py-2 rounded-xl transition-colors"
+              >
+                <ChevronLeft size={13} /> Previous
+              </Link>
+            )}
+            {page < totalPages && (
+              <Link
+                href={{ query: { ...sp, page: page + 1 } }}
+                className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-[#125DE5] border border-gray-200 hover:border-[#125DE5] px-3 py-2 rounded-xl transition-colors"
+              >
+                Next <ChevronRight size={13} />
+              </Link>
+            )}
           </div>
         </div>
       )}

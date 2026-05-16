@@ -35,12 +35,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function PropertyDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const [property, recommended] = await Promise.all([
-    propertyService.getBySlug(slug),
-    propertyService.getBySlug(slug).then((p) => p ? propertyService.getRecommended(p.id, 3) : []),
-  ])
-
+  const property = await propertyService.getBySlug(slug)
   if (!property) notFound()
+
+  const recommended = await propertyService.getRecommended(property.id, 3)
 
   const startingPrice = property.startingPrice ?? null
 

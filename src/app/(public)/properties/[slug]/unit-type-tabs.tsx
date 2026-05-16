@@ -89,7 +89,7 @@ export function UnitTypeTabs({ unitTypes }: { unitTypes: UnitType[] }) {
   const stats = [
     { icon: <Bed size={13} />, label: `${unit.bedrooms} ${unit.bedrooms === 1 ? 'Bedroom' : 'Bedrooms'}` },
     { icon: <Bath size={13} />, label: `${unit.bathrooms} ${unit.bathrooms === 1 ? 'Bathroom' : 'Bathrooms'}` },
-    { icon: <Square size={13} />, label: `${unit.areaSqmMin} m²` },
+    { icon: <Square size={13} />, label: `${unit.areaSqmMin}${unit.areaSqmMax ? ` – ${unit.areaSqmMax}` : ''} m²` },
     ...(unit.parking > 0 ? [{ icon: <Car size={13} />, label: `${unit.parking} Parking` }] : []),
   ]
 

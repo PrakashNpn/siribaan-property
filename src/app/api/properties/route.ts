@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { propertyService } from '@/features/property/server/property.service'
 import { propertySchema, unitTypeSchema } from '@/features/property/validation'
 import { resolveShortMapUrl } from '@/lib/utils'
+import { requireAdminSession } from '@/lib/admin-auth'
 import { z } from 'zod'
 
 const createPropertySchema = propertySchema.extend({
@@ -15,13 +16,16 @@ export async function GET(request: NextRequest) {
   const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined
   const type = searchParams.get('type') || undefined
   const page = searchParams.get('page') ? Number(searchParams.get('page')) : undefined
-  const pageSize = searchParams.get('pageSize') ? Number(searchParams.get('pageSize')) : undefined
+  const pageSize = searchParams.get('pageSize') ? Math.min(Number(searchParams.get('pageSize')), 100) : undefined
 
   const result = await propertyService.getAll({ location, minPrice, maxPrice, type }, { page, pageSize })
   return NextResponse.json(result)
 }
 
 export async function POST(request: NextRequest) {
+  const unauth = await requireAdminSession()
+  if (unauth) return unauth
+
   const body = await request.json()
   const parsed = createPropertySchema.safeParse(body)
   if (!parsed.success) {

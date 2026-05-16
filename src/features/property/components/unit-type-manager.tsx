@@ -94,7 +94,7 @@ function UnitTypeForm({
       </div>
 
       {/* Core fields */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-5 gap-3">
         <div>
           <label className={labelCls}>Bedrooms <span className="text-red-400">*</span></label>
           <input
@@ -108,9 +108,18 @@ function UnitTypeForm({
           />
         </div>
         <div>
-          <label className={labelCls}>Area m² <span className="text-red-400">*</span></label>
-          <input {...register('areaSqmMin', { valueAsNumber: true })} type="number" min="1" step="0.5" placeholder="e.g. 32.5" className={inputCls} />
+          <label className={labelCls}>Bathrooms <span className="text-red-400">*</span></label>
+          <input {...register('bathrooms', { valueAsNumber: true })} type="number" min="1" className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Min m² <span className="text-red-400">*</span></label>
+          <input {...register('areaSqmMin', { valueAsNumber: true })} type="number" min="1" step="0.01" placeholder="e.g. 32.25" className={inputCls} />
           {errors.areaSqmMin && <p className="text-red-500 text-xs mt-1">{errors.areaSqmMin.message}</p>}
+        </div>
+        <div>
+          <label className={labelCls}>Max m² <span className="text-gray-300 font-normal normal-case tracking-normal">optional</span></label>
+          <input {...register('areaSqmMax', { valueAsNumber: true, setValueAs: v => v === '' || isNaN(v) ? null : v })} type="number" min="1" step="0.01" placeholder="e.g. 45.25" className={inputCls} />
+          {errors.areaSqmMax && <p className="text-red-500 text-xs mt-1">{errors.areaSqmMax.message}</p>}
         </div>
         <div>
           <label className={labelCls}>Parking</label>
@@ -224,7 +233,7 @@ function SavedUnitTypeRow({ unit, folderId }: { unit: UnitType; folderId: string
           <span className="flex items-center gap-1"><Bed size={11} className="text-[#125DE5]" /> {unit.bedrooms}BR</span>
         </td>
         <td className="px-5 py-3 text-xs text-gray-600">
-          <span className="flex items-center gap-1"><Square size={11} className="text-[#125DE5]" />{unit.areaSqmMin} m²</span>
+          <span className="flex items-center gap-1"><Square size={11} className="text-[#125DE5]" />{unit.areaSqmMin}{unit.areaSqmMax ? ` – ${unit.areaSqmMax}` : ''} m²</span>
         </td>
         <td className="px-5 py-3">
           <div className="flex items-center justify-end gap-1">
@@ -242,7 +251,7 @@ function SavedUnitTypeRow({ unit, folderId }: { unit: UnitType; folderId: string
         <tr>
           <td colSpan={4} className="px-5 py-4 bg-gray-50/50">
             <UnitTypeForm
-              defaultValues={{ name: unit.name, bedrooms: unit.bedrooms, bathrooms: unit.bathrooms, areaSqmMin: unit.areaSqmMin, parking: unit.parking, images: unit.images }}
+              defaultValues={{ name: unit.name, bedrooms: unit.bedrooms, bathrooms: unit.bathrooms, areaSqmMin: unit.areaSqmMin, areaSqmMax: unit.areaSqmMax, parking: unit.parking, images: unit.images }}
               onSave={handleSave}
               onCancel={() => setEditing(false)}
               folderId={folderId}
@@ -275,7 +284,13 @@ export function UnitTypeManager({ propertyId, folderId: folderIdProp, unitTypes,
     const updated = [...pendingUnitTypes!]; updated[index] = data
     onPendingChange!(updated); setEditingPendingIndex(null)
   }
-  const handleDeletePending = (index: number) => onPendingChange!(pendingUnitTypes!.filter((_, i) => i !== index))
+  const handleDeletePending = (index: number) => {
+    const unit = pendingUnitTypes![index]
+    unit.images?.forEach((url) =>
+      fetch('/api/upload', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) }).catch(() => {})
+    )
+    onPendingChange!(pendingUnitTypes!.filter((_, i) => i !== index))
+  }
 
   const displayUnits = isPending ? pendingUnitTypes! : unitTypes
 
@@ -307,7 +322,7 @@ export function UnitTypeManager({ propertyId, folderId: folderIdProp, unitTypes,
                       </div>
                     </td>
                     <td className="px-5 py-3 text-xs text-gray-600"><span className="flex items-center gap-1"><Bed size={11} className="text-[#125DE5]" /> {unit.bedrooms}BR</span></td>
-                    <td className="px-5 py-3 text-xs text-gray-600"><span className="flex items-center gap-1"><Square size={11} className="text-[#125DE5]" />{unit.areaSqmMin} m²</span></td>
+                    <td className="px-5 py-3 text-xs text-gray-600"><span className="flex items-center gap-1"><Square size={11} className="text-[#125DE5]" />{unit.areaSqmMin}{unit.areaSqmMax ? ` – ${unit.areaSqmMax}` : ''} m²</span></td>
                     <td className="px-5 py-3">
                       <div className="flex items-center justify-end gap-1">
                         <button type="button" onClick={() => setEditingPendingIndex(editingPendingIndex === i ? null : i)} className="p-1.5 text-gray-400 hover:text-[#125DE5] hover:bg-blue-50 rounded-lg transition-colors">

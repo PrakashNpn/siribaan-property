@@ -117,7 +117,7 @@ function Lightbox({
                   src={images[index]}
                   alt={`Photo ${index + 1}`}
                   fill
-                  sizes="100vw"
+                  sizes="(max-width: 768px) 100vw, calc(100vw - 160px)"
                   className="object-contain"
                   priority
                 />

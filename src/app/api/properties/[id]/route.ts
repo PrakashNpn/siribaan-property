@@ -3,6 +3,7 @@ import { propertyService } from '@/features/property/server/property.service'
 import { propertySchema } from '@/features/property/validation'
 import { supabaseAdmin } from '@/lib/supabase'
 import { resolveShortMapUrl } from '@/lib/utils'
+import { requireAdminSession } from '@/lib/admin-auth'
 
 const BUCKET = 'property-images'
 
@@ -28,6 +29,9 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const unauth = await requireAdminSession()
+  if (unauth) return unauth
+
   const { id } = await params
   const body = await request.json()
   const parsed = propertySchema.partial().safeParse(body)
@@ -64,21 +68,21 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   }
 }
 
-async function deleteFolder(folder: string) {
-  const { data } = await supabaseAdmin.storage.from(BUCKET).list(folder)
-  if (data?.length) {
-    const paths = data.map((f) => `${folder}/${f.name}`)
-    await supabaseAdmin.storage.from(BUCKET).remove(paths)
-  }
-}
 
-export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const unauth = await requireAdminSession()
+  if (unauth) return unauth
+
   const { id } = await params
   try {
-    await Promise.all([
-      deleteFolder(`properties/${id}/images`),
-      deleteFolder(`properties/${id}/unit-types`),
-    ])
+    const property = await propertyService.getById(id)
+    if (property) {
+      const allImages = [
+        ...property.images,
+        ...property.unitTypes.flatMap((ut) => ut.images),
+      ]
+      if (allImages.length > 0) await deleteStorageUrls(allImages)
+    }
   } catch { /* storage cleanup failure should not block the delete */ }
   await propertyService.delete(id)
   return NextResponse.json({ success: true })

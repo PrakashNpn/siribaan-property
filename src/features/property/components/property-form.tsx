@@ -46,11 +46,12 @@ function SectionHeader({ title, desc }: { title: string; desc?: string }) {
 
 export function PropertyForm({ property }: PropertyFormProps) {
   const router = useRouter()
-  const [folderId] = useState(() => property?.id ?? crypto.randomUUID())
+  const [fallbackFolderId] = useState(() => crypto.randomUUID())
   const [uploading, setUploading] = useState(false)
   const [images, setImages] = useState<PendingImage[]>(
     (property?.images || []).map((url) => ({ type: 'url' as const, url }))
   )
+  const [removedImages, setRemovedImages] = useState<string[]>([])
   const [imageError, setImageError] = useState<string | null>(null)
   const [nearbyInput, setNearbyInput] = useState('')
   const [customAmenityInput, setCustomAmenityInput] = useState('')
@@ -65,7 +66,7 @@ export function PropertyForm({ property }: PropertyFormProps) {
     developer?: string | null; listingType?: string | null; projectStatus?: string | null; startingPrice?: number | null
     location?: string; address?: string
     nearbyPlaces?: string[]; amenities?: string[]; totalFloors?: number | null; totalUnits?: number | null; yearBuilt?: number | null
-    unitTypes?: Array<{ name: string; bedrooms: number; bathrooms: number; areaSqmMin: number; parking: number }>
+    unitTypes?: Array<{ name: string; bedrooms: number; bathrooms: number; areaSqmMin: number; areaSqmMax?: number | null; parking: number }>
   } | null>(null)
   const [pdfApplied, setPdfApplied] = useState(false)
   const [pdfLoading, setPdfLoading] = useState(false)
@@ -116,6 +117,7 @@ export function PropertyForm({ property }: PropertyFormProps) {
         bedrooms: u.bedrooms,
         bathrooms: u.bathrooms ?? Math.max(1, u.bedrooms),
         areaSqmMin: u.areaSqmMin,
+        areaSqmMax: u.areaSqmMax ?? null,
         parking: u.parking ?? 1,
         images: [],
       })))
@@ -172,9 +174,19 @@ export function PropertyForm({ property }: PropertyFormProps) {
   })
 
   const watchedTitle = watch('title')
+  const watchedSlug = watch('slug')
   const watchedAmenities = watch('amenities') || []
   const watchedNearby = watch('nearbyPlaces') || []
   const watchedFeatured = watch('featured')
+
+  const folderId = (() => {
+    if (property?.images?.[0]) {
+      const match = property.images[0].match(/\/properties\/([^/]+)\/images\//)
+      if (match) return match[1]
+    }
+    if (property) return property.id
+    return watchedSlug || fallbackFolderId
+  })()
 
   // Auto-generate slug only for new properties
   useEffect(() => {
@@ -224,8 +236,7 @@ export function PropertyForm({ property }: PropertyFormProps) {
     if (item.type === 'file') {
       URL.revokeObjectURL(item.preview)
     } else {
-      fetch('/api/upload', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: item.url }) })
-        .catch(console.error)
+      setRemovedImages((prev) => [...prev, item.url])
     }
     setImages((prev) => prev.filter((_, i) => i !== index))
   }
@@ -296,6 +307,14 @@ export function PropertyForm({ property }: PropertyFormProps) {
           throw new Error(`Validation failed — ${fields}`)
         }
         throw new Error(json.message || `Server error ${res.status}`)
+      }
+      // Purge deferred-removed images from storage only after a confirmed save
+      if (removedImages.length > 0) {
+        removedImages.forEach((url) => {
+          fetch('/api/upload', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) })
+            .catch(console.error)
+        })
+        setRemovedImages([])
       }
       toast.success(property ? 'Property updated successfully.' : 'Property created successfully.')
       router.push('/admin/properties')
@@ -460,7 +479,7 @@ export function PropertyForm({ property }: PropertyFormProps) {
                             <div className="flex flex-wrap gap-1.5">
                               {pdfAiData.unitTypes.map((u, i) => (
                                 <span key={i} className="text-xs bg-white border border-blue-100 rounded-lg px-2 py-0.5 text-gray-600">
-                                  {u.name} · {u.areaSqmMin} m²
+                                  {u.name} · {u.areaSqmMin}{u.areaSqmMax ? ` – ${u.areaSqmMax}` : ''} m²
                                 </span>
                               ))}
                             </div>

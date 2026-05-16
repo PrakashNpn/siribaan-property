@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import { createHmac, timingSafeEqual } from 'crypto'
+import { NextResponse } from 'next/server'
 
 const COOKIE_NAME = 'spg_admin_session'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
@@ -59,4 +60,10 @@ export async function getAdminSession(): Promise<boolean> {
   const token = cookieStore.get(COOKIE_NAME)?.value
   if (!token) return false
   return verifyToken(token)
+}
+
+export async function requireAdminSession(): Promise<NextResponse | null> {
+  const ok = await getAdminSession()
+  if (!ok) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  return null
 }

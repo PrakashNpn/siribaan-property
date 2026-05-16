@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { propertyService } from '@/features/property/server/property.service'
 import { unitTypeSchema } from '@/features/property/validation'
+import { requireAdminSession } from '@/lib/admin-auth'
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const unauth = await requireAdminSession()
+  if (unauth) return unauth
+
   const { id } = await params
   const body = await request.json()
   const parsed = unitTypeSchema.safeParse(body)

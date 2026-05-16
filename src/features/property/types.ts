@@ -5,6 +5,7 @@ export interface UnitType {
   bedrooms: number
   bathrooms: number
   areaSqmMin: number
+  areaSqmMax?: number | null
   parking: number
   images: string[]
   createdAt: Date

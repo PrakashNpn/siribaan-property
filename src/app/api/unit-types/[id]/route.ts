@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { propertyService } from '@/features/property/server/property.service'
 import { unitTypeSchema } from '@/features/property/validation'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdminSession } from '@/lib/admin-auth'
 
 const BUCKET = 'property-images'
 
@@ -20,6 +21,9 @@ async function deleteStorageUrls(urls: string[]) {
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const unauth = await requireAdminSession()
+  if (unauth) return unauth
+
   const { id } = await params
   const body = await request.json()
   const parsed = unitTypeSchema.partial().safeParse(body)
@@ -47,7 +51,10 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   }
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const unauth = await requireAdminSession()
+  if (unauth) return unauth
+
   const { id } = await params
 
   // Clean up storage before deleting from DB

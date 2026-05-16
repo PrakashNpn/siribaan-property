@@ -71,7 +71,14 @@ export const propertyRepository = {
   delete: async (id: string) =>
     withRetry(() => prisma.property.delete({ where: { id } })),
 
-  findAllAdmin: async (filters?: { search?: string; status?: string; type?: string; sort?: string }) => {
+  findAllAdmin: async (
+    filters?: { search?: string; status?: string; type?: string; sort?: string },
+    pagination?: { page?: number; pageSize?: number }
+  ) => {
+    const page = pagination?.page ?? 1
+    const pageSize = Math.min(pagination?.pageSize ?? 20, 100)
+    const skip = (page - 1) * pageSize
+
     const where = {
       ...(filters?.search && {
         OR: [
@@ -82,22 +89,29 @@ export const propertyRepository = {
       ...(filters?.status && filters.status !== 'all' && { status: filters.status }),
       ...(filters?.type && filters.type !== 'all' && { type: filters.type }),
     }
+
+    const isPriceSort = filters?.sort === 'price-asc' || filters?.sort === 'price-desc'
+
     const orderBy =
       filters?.sort === 'oldest' ? { createdAt: 'asc' as const }
       : filters?.sort === 'title-asc' ? { title: 'asc' as const }
+      : filters?.sort === 'price-asc' ? { startingPrice: 'asc' as const }
+      : filters?.sort === 'price-desc' ? { startingPrice: 'desc' as const }
       : { createdAt: 'desc' as const }
 
-    const results = await withRetry(() => prisma.property.findMany({ where, orderBy, include: withUnitTypes }))
-
-    if (filters?.sort === 'price-asc' || filters?.sort === 'price-desc') {
-      const dir = filters.sort === 'price-asc' ? 1 : -1
-      return results.sort((a, b) => {
-        const aPrice = a.startingPrice ?? 0
-        const bPrice = b.startingPrice ?? 0
-        return (aPrice - bPrice) * dir
-      })
-    }
-    return results
+    return withRetry(async () => {
+      const [properties, total] = await prisma.$transaction([
+        prisma.property.findMany({
+          where,
+          orderBy: isPriceSort ? [{ startingPrice: orderBy.startingPrice }, { createdAt: 'desc' as const }] : orderBy,
+          skip,
+          take: pageSize,
+          include: withUnitTypes,
+        }),
+        prisma.property.count({ where }),
+      ])
+      return { properties, total, page, pageSize, totalPages: Math.ceil(total / pageSize) }
+    })
   },
 
   createUnitType: async (propertyId: string, data: UnitTypeFormData) =>

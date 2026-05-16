@@ -25,8 +25,10 @@ export const propertyService = {
 
   delete: (id: string) => propertyRepository.delete(id),
 
-  getAllAdmin: (filters?: { search?: string; status?: string; type?: string; sort?: string }) =>
-    propertyRepository.findAllAdmin(filters),
+  getAllAdmin: (
+    filters?: { search?: string; status?: string; type?: string; sort?: string },
+    pagination?: { page?: number; pageSize?: number }
+  ) => propertyRepository.findAllAdmin(filters, pagination),
 
   createUnitType: (propertyId: string, data: UnitTypeFormData) =>
     propertyRepository.createUnitType(propertyId, data),

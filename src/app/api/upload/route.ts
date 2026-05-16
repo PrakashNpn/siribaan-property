@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdminSession } from '@/lib/admin-auth'
 
 export async function POST(request: NextRequest) {
+  const unauth = await requireAdminSession()
+  if (unauth) return unauth
+
   const { searchParams } = new URL(request.url)
   const folder = searchParams.get('folder')?.replace(/^\/|\/$/g, '') || 'general'
 
   const formData = await request.formData()
   const file = formData.get('file') as File
   if (!file) return NextResponse.json({ error: 'No file' }, { status: 400 })
+
+  const MAX_SIZE = 10 * 1024 * 1024 // 10 MB
+  if (file.size > MAX_SIZE) {
+    return NextResponse.json({ error: 'File exceeds 10 MB limit' }, { status: 413 })
+  }
 
   const bytes = await file.arrayBuffer()
   const buffer = Buffer.from(bytes)
@@ -28,6 +37,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const unauth = await requireAdminSession()
+  if (unauth) return unauth
+
   const { url } = await request.json()
   if (!url || typeof url !== 'string') {
     return NextResponse.json({ error: 'No URL provided' }, { status: 400 })
