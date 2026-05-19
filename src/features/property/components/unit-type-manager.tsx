@@ -186,7 +186,8 @@ function DeleteConfirm({ name, onConfirm, onCancel, loading }: { name: string; o
   )
 }
 
-function SavedUnitTypeRow({ unit, folderId }: { unit: UnitType; folderId: string }) {
+function SavedUnitTypeRow({ unit, folderId: folderIdProp }: { unit: UnitType; folderId: string }) {
+  const folderId = unit.images[0]?.match(/\/properties\/([^/]+)\/unit-types\//)?.[1] ?? folderIdProp
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [editing, setEditing] = useState(false)

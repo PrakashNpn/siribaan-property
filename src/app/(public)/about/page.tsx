@@ -82,9 +82,10 @@ export default function AboutPage() {
                 src="/siriban-about-hero.png"
                 alt="Siribaan Property Group"
                 fill
-                sizes="(max-width: 768px) 100vw, 1280px"
+                sizes="(max-width: 768px) calc(100vw - 32px), 1280px"
                 className="object-cover object-right-bottom"
                 priority
+                loading="eager"
               />
               <div className="absolute inset-0 bg-[#125DE5]/10" />
               <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent to-blue-50/70" />
@@ -229,11 +230,11 @@ export default function AboutPage() {
             <AnimateInView delay={0.15} direction="right" className="lg:col-span-2">
               <div className="relative rounded-2xl overflow-hidden min-h-[280px] sm:min-h-[340px] lg:min-h-full">
                 <Image
-                  src="/about-siribaans.png"
+                  src="/about-content.png"
                   alt="Siribaan Property"
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
-                  className="object-cover"
+                  className=""
                 />
                 <div className="absolute inset-0 bg-[#125DE5]/10" />
               </div>
@@ -334,7 +335,7 @@ export default function AboutPage() {
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none" />
                 <div className="relative z-10">
                   <h3 className="text-xl font-bold text-gray-900 mb-1">Send an Inquiry</h3>
-                  <p className="text-gray-400 text-sm mb-6">We typically respond within 2 business hours.</p>
+                  <p className="text-gray-400 text-sm mb-6">We typically respond within 8 business hours.</p>
                   <InquiryForm variant="contact" />
                 </div>
               </div>

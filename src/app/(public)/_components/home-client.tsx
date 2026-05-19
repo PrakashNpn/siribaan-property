@@ -174,6 +174,7 @@ export function HomeClient({ featured }: HomeClientProps) {
             fill
             className=""
             priority
+            loading="eager"
             sizes="60vw"
           />
         </motion.div>
@@ -202,6 +203,7 @@ export function HomeClient({ featured }: HomeClientProps) {
             fill
             className="object-cover"
             priority
+            loading="eager"
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-slate-900/78" />
@@ -323,7 +325,7 @@ export function HomeClient({ featured }: HomeClientProps) {
           {/* Left: image fills column, no padding */}
           <motion.div {...slideIn('left')} className="relative min-h-[360px] lg:min-h-0">
             <Image
-              src="/about-siribaan.png"
+              src="/testing-again.png"
               alt="Siribaan luxury living"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"

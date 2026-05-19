@@ -59,7 +59,11 @@ export default async function EditPropertyPage({ params }: { params: Promise<{ i
           <h2 className="text-lg font-bold text-gray-900">Unit Types</h2>
           <p className="text-sm text-gray-400 mt-0.5">Manage the unit types available in this property.</p>
         </div>
-        <UnitTypeManager propertyId={property.id} unitTypes={property.unitTypes} />
+        <UnitTypeManager
+          propertyId={property.id}
+          folderId={property.images[0]?.match(/\/properties\/([^/]+)\/images\//)?.[1] ?? property.id}
+          unitTypes={property.unitTypes}
+        />
       </div>
     </div>
   )

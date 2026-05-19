@@ -41,7 +41,7 @@ export function InquiryForm({ propertyId, variant = 'sidebar' }: InquiryFormProp
       <div className="text-center py-8">
         <div className="text-green-600 text-4xl mb-2">✓</div>
         <h3 className="font-semibold text-gray-900 mb-1">Inquiry Sent!</h3>
-        <p className="text-sm text-gray-500">Our team will reach out within 24 hours.</p>
+        <p className="text-sm text-gray-500">Our team will reach out to you within 8 business hours.</p>
       </div>
     )
   }

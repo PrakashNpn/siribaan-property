@@ -81,6 +81,8 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
               fill
               className="object-cover object-center"
               priority
+              loading="eager"
+              sizes="(max-width: 768px) calc(100vw - 32px), min(calc(100vw - 48px), 1232px)"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-black/10 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-t from-blue-50 via-blue-50/20 to-transparent" />

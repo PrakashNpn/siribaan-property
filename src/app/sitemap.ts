@@ -5,7 +5,7 @@ const BASE = 'https://siribaanproperty.com'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const properties = await prisma.property.findMany({
-    select: { id: true, updatedAt: true },
+    select: { slug: true, updatedAt: true },
   })
 
   return [
@@ -15,7 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/privacy-policy`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
     { url: `${BASE}/terms`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
     ...properties.map((p) => ({
-      url: `${BASE}/properties/${p.id}`,
+      url: `${BASE}/properties/${p.slug}`,
       lastModified: p.updatedAt,
       changeFrequency: 'weekly' as const,
       priority: 0.8,

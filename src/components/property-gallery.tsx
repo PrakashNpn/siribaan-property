@@ -209,7 +209,7 @@ export function PropertyGallery({ images, alt, tag }: PropertyGalleryProps) {
               style={{ flex: count > 1 ? 3 : 1 }}
               onClick={() => openLightbox(0)}
             >
-              <Image src={img0} alt={alt} fill sizes="100vw" className="object-cover" priority />
+              <Image src={img0} alt={alt} fill sizes="calc(100vw - 32px)" className="object-cover" priority loading="eager" />
               {tag && (
                 <span className="absolute top-3 left-3 bg-[#125DE5] text-white text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wide z-10">
                   {tag}
@@ -254,9 +254,10 @@ export function PropertyGallery({ images, alt, tag }: PropertyGalleryProps) {
                 src={img0}
                 alt={alt}
                 fill
-                sizes={count > 1 ? '55vw' : '100vw'}
+                sizes={count > 1 ? '55vw' : 'calc(100vw - 48px)'}
                 className="object-cover group-hover:scale-[1.02] transition-transform duration-700"
                 priority
+                loading="eager"
               />
               <div className="absolute inset-0 bg-[#125DE5]/0 group-hover:bg-[#125DE5]/5 transition-colors duration-300" />
               {tag && (

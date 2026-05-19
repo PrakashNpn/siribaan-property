@@ -61,6 +61,7 @@ export function ImageCarousel({ images, alt, tag, location }: ImageCarouselProps
             sizes="100vw"
             className="object-cover"
             priority={current === 0}
+            loading={current === 0 ? 'eager' : 'lazy'}
           />
         </motion.div>
       </AnimatePresence>
