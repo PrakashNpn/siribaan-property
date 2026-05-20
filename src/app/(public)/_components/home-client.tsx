@@ -216,7 +216,7 @@ export function HomeClient({ featured, propertyCount }: HomeClientProps) {
         {/* Hero content */}
         <div className="relative z-20 h-full flex items-center">
           <div className="max-w-7xl mx-auto px-6 w-full">
-            <div className="md:max-w-[58%] lg:max-w-[38%]">
+            <div className="lg:max-w-[38%]">
 
               <motion.p
                 {...fadeUp(0)}
@@ -382,13 +382,14 @@ export function HomeClient({ featured, propertyCount }: HomeClientProps) {
           <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
 
           {/* Left: image fills column, no padding */}
-          <motion.div {...slideIn('left')} className="relative min-h-[360px] lg:min-h-0">
+          <motion.div {...slideIn('left')} className="relative lg:min-h-0">
             <Image
-              src="/home-about-section.png"
+              src="/home-about-section-image.png"
               alt="Siribaan luxury living"
-              fill
+              width={1024}
+              height={1013}
               sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover"
+              className="w-full h-auto lg:absolute lg:inset-0 lg:h-full lg:object-cover lg:object-left-top"
             />
           </motion.div>
 
