@@ -102,6 +102,12 @@ export function PropertyFilters() {
     setIsLoading(false)
   }, [searchParams])
 
+  useEffect(() => {
+    if (!isLoading) return
+    const id = setTimeout(() => setIsLoading(false), 5000)
+    return () => clearTimeout(id)
+  }, [isLoading])
+
   const buildParams = (overrides: { location?: string; priceRange?: string; type?: string }) => {
     const merged = { location, priceRange, type, ...overrides }
     const params = new URLSearchParams()
@@ -112,9 +118,13 @@ export function PropertyFilters() {
   }
 
   const handleSearch = () => {
+    const query = buildParams({})
+    const newUrl = `/properties${query ? `?${query}` : ''}`
+    const currentUrl = window.location.pathname + window.location.search.replace(/^\?$/, '')
+    if (newUrl === currentUrl) return
     topLoader.start()
     setIsLoading(true)
-    router.push(`/properties?${buildParams({})}`)
+    router.push(newUrl)
   }
 
   const handlePriceChange = (v: string) => {
