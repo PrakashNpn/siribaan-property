@@ -8,7 +8,8 @@ const globalForPrisma = globalThis as unknown as {
 function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL
   if (!connectionString) throw new Error('DATABASE_URL environment variable is not set')
-  const adapter = new PrismaPg({ connectionString })
+  // max:2 prevents exhausting PgBouncer's connection slots on Supabase
+  const adapter = new PrismaPg({ connectionString, max: 2 })
   return new PrismaClient({ adapter })
 }
 
@@ -16,7 +17,7 @@ export const prisma = globalForPrisma.prisma ?? createPrismaClient()
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
-const TRANSIENT_CODES = ['EAI_AGAIN', 'ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED']
+const TRANSIENT_CODES = ['EAI_AGAIN', 'ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'Unable to start a transaction']
 
 function isTransient(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err)

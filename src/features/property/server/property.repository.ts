@@ -17,13 +17,15 @@ export const propertyRepository = {
       ...(filters?.location && { location: { contains: filters.location, mode: 'insensitive' as const } }),
       ...(filters?.type && filters.type !== 'All' && { type: filters.type }),
       ...((filters?.minPrice !== undefined || filters?.maxPrice !== undefined) && {
-        ...(filters?.minPrice ? { startingPrice: { gte: filters.minPrice } } : {}),
-        ...(filters?.maxPrice ? { startingPrice: { lte: filters.maxPrice } } : {}),
+        startingPrice: {
+          ...(filters?.minPrice !== undefined ? { gte: filters.minPrice } : {}),
+          ...(filters?.maxPrice !== undefined ? { lte: filters.maxPrice } : {}),
+        },
       }),
     }
 
     return withRetry(async () => {
-      const [properties, total] = await prisma.$transaction([
+      const [properties, total] = await Promise.all([
         prisma.property.findMany({ where, skip, take: pageSize, orderBy: { createdAt: 'desc' }, include: withUnitTypes }),
         prisma.property.count({ where }),
       ])
@@ -36,6 +38,9 @@ export const propertyRepository = {
 
   findBySlug: async (slug: string) =>
     withRetry(() => prisma.property.findUnique({ where: { slug }, include: withUnitTypes })),
+
+  countActive: async () =>
+    withRetry(() => prisma.property.count({ where: { status: 'active' } })),
 
   findFeatured: async (limit = 4) =>
     withRetry(() => prisma.property.findMany({
@@ -100,7 +105,7 @@ export const propertyRepository = {
       : { createdAt: 'desc' as const }
 
     return withRetry(async () => {
-      const [properties, total] = await prisma.$transaction([
+      const [properties, total] = await Promise.all([
         prisma.property.findMany({
           where,
           orderBy: isPriceSort ? [{ startingPrice: orderBy.startingPrice }, { createdAt: 'desc' as const }] : orderBy,

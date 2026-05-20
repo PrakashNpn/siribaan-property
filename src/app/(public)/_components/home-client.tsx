@@ -10,6 +10,7 @@ import { Property } from '@/features/property/types'
 
 interface HomeClientProps {
   featured: Property[]
+  propertyCount: number
 }
 
 // ── Wave dividers ──────────────────────────────────────────────────────────────
@@ -99,11 +100,10 @@ function CounterStat({ value, label, index }: { value: string; label: string; in
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
-const STATS = [
-  { value: '250+', label: 'Properties Listed' },
-  { value: '12', label: 'Years of Excellence' },
-  { value: '฿50B+', label: 'Portfolio Value' },
-  { value: '500+', label: 'Families Served' },
+const BASE_STATS = [
+  { value: '24/7', label: 'Client Support' },
+  { value: '100%', label: 'Verified Listings' },
+  { value: '30+', label: 'Developer Partners' },
 ]
 
 const VALUE_PROPS = [
@@ -114,11 +114,15 @@ const VALUE_PROPS = [
 
 // ── Main export ────────────────────────────────────────────────────────────────
 
-export function HomeClient({ featured }: HomeClientProps) {
+export function HomeClient({ featured, propertyCount }: HomeClientProps) {
+  const STATS = [
+    { value: `${Math.floor(propertyCount / 5) * 5}+`, label: 'Properties Listed' },
+    ...BASE_STATS,
+  ]
   return (
     <>
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
-      <section className="relative h-[88vh] min-h-[640px] overflow-hidden">
+      <section className="relative h-[95vh] min-h-[640px] overflow-hidden">
 
         {/* Pure white base — desktop */}
         <div className="hidden lg:block absolute inset-0 z-0 bg-white" />
@@ -204,7 +208,7 @@ export function HomeClient({ featured }: HomeClientProps) {
             className="object-cover"
             priority
             loading="eager"
-            sizes="100vw"
+            sizes="(min-width: 1024px) 0vw, 100vw"
           />
           <div className="absolute inset-0 bg-slate-900/78" />
         </div>
@@ -315,67 +319,6 @@ export function HomeClient({ featured }: HomeClientProps) {
         <WaveDown />
       </section>
 
-      {/* ── ABOUT SPLIT ───────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-white">
-        <div className="absolute -top-32 right-0 w-[500px] h-[500px] rounded-full bg-[#125DE5] blur-3xl opacity-[0.08] pointer-events-none" />
-        <div className="absolute bottom-0 right-[10%] w-[420px] h-[420px] rounded-full bg-[#125DE5] blur-3xl opacity-[0.1] pointer-events-none" />
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
-
-          {/* Left: image fills column, no padding */}
-          <motion.div {...slideIn('left')} className="relative min-h-[360px] lg:min-h-0">
-            <Image
-              src="/testing-again.png"
-              alt="Siribaan luxury living"
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover"
-            />
-          </motion.div>
-
-          {/* Right: content with its own padding */}
-          <motion.div {...slideIn('right')} className="flex flex-col justify-center py-20 px-8 lg:px-12 xl:px-16">
-            <p className="text-blue-600 text-xs font-bold uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-              <span className="w-8 h-px bg-blue-600 inline-block" />
-              About Siribaan
-            </p>
-            <h2
-              className="text-4xl md:text-5xl font-semibold text-gray-900 mb-5 leading-tight"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              Redefining High-End<br />
-              <span className="italic text-blue-600">Real Estate in Asia.</span>
-            </h2>
-            <p className="text-gray-500 leading-relaxed mb-4 text-sm">
-              Experience a seamless blend of heritage and high-end innovation. Siribaan Property Group curates the most exclusive residences across Asia's most sought-after addresses — where architectural brilliance meets the pinnacle of luxury living.
-            </p>
-            <p className="text-gray-500 leading-relaxed mb-8 text-sm">
-              Every property in our portfolio undergoes a rigorous selection process, ensuring it meets our exacting standards for location, craftsmanship, and long-term investment value.
-            </p>
-
-            <div className="space-y-5 mb-8">
-              {VALUE_PROPS.map(({ Icon, title, desc }, i) => (
-                <motion.div key={title} {...fadeInView(i * 0.1)} className="flex gap-4 items-start">
-                  <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
-                    <Icon size={18} className="text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 text-sm mb-0.5">{title}</p>
-                    <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            <Link href="/about" className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm hover:gap-3 transition-all">
-              Learn More About Us <ArrowRight size={16} />
-            </Link>
-          </motion.div>
-
-          </div>
-        </div>
-      </section>
-
       {/* ── FEATURED PROPERTIES ───────────────────────────────────────────── */}
       <section className="relative pt-20 pb-16 bg-gray-50 overflow-hidden">
         <div className="absolute -top-40 right-0 w-[500px] h-[500px] rounded-full bg-[#125DE5] blur-3xl opacity-[0.05] pointer-events-none" />
@@ -428,6 +371,67 @@ export function HomeClient({ featured }: HomeClientProps) {
               View All Properties <ArrowRight size={16} />
             </Link>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ── ABOUT SPLIT ───────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-white">
+        <div className="absolute -top-32 right-0 w-[500px] h-[500px] rounded-full bg-[#125DE5] blur-3xl opacity-[0.08] pointer-events-none" />
+        <div className="absolute bottom-0 right-[10%] w-[420px] h-[420px] rounded-full bg-[#125DE5] blur-3xl opacity-[0.1] pointer-events-none" />
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
+
+          {/* Left: image fills column, no padding */}
+          <motion.div {...slideIn('left')} className="relative min-h-[360px] lg:min-h-0">
+            <Image
+              src="/home-about-section.png"
+              alt="Siribaan luxury living"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+            />
+          </motion.div>
+
+          {/* Right: content with its own padding */}
+          <motion.div {...slideIn('right')} className="flex flex-col justify-center py-20 px-8 lg:px-12 xl:px-16">
+            <p className="text-blue-600 text-xs font-bold uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+              <span className="w-8 h-px bg-blue-600 inline-block" />
+              About Siribaan
+            </p>
+            <h2
+              className="text-4xl md:text-5xl font-semibold text-gray-900 mb-5 leading-tight"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Redefining High-End<br />
+              <span className="italic text-blue-600">Real Estate in Asia.</span>
+            </h2>
+            <p className="text-gray-500 leading-relaxed mb-4 text-sm">
+              Experience a seamless blend of heritage and high-end innovation. Siribaan Property Group curates the most exclusive residences across Asia's most sought-after addresses — where architectural brilliance meets the pinnacle of luxury living.
+            </p>
+            <p className="text-gray-500 leading-relaxed mb-8 text-sm">
+              Every property in our portfolio undergoes a rigorous selection process, ensuring it meets our exacting standards for location, craftsmanship, and long-term investment value.
+            </p>
+
+            <div className="space-y-5 mb-8">
+              {VALUE_PROPS.map(({ Icon, title, desc }, i) => (
+                <motion.div key={title} {...fadeInView(i * 0.1)} className="flex gap-4 items-start">
+                  <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                    <Icon size={18} className="text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900 text-sm mb-0.5">{title}</p>
+                    <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <Link href="/about" className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm hover:gap-3 transition-all">
+              Learn More About Us <ArrowRight size={16} />
+            </Link>
+          </motion.div>
+
+          </div>
         </div>
       </section>
 

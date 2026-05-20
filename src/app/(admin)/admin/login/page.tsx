@@ -24,7 +24,7 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="flex flex-col items-center mb-8">
             <div className="w-12 h-12 relative mb-4">
-              <Image src="/logo/logo-transparent.png" alt="Siribaan" fill sizes="48px" className="object-contain" />
+              <Image src="/logo-symbol-transparent.png" alt="Siribaan" fill sizes="48px" className="object-contain" />
             </div>
             <h1 className="text-white text-lg font-bold tracking-wide">Siribaan Admin</h1>
             <p className="text-blue-300/70 text-xs mt-1 uppercase tracking-widest">Secure Access</p>

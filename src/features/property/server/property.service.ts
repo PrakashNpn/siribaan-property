@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { propertyRepository } from './property.repository'
 import { PropertyFormData, UnitTypeFormData } from '../validation'
 
@@ -9,9 +10,11 @@ export const propertyService = {
 
   getById: (id: string) => propertyRepository.findById(id),
 
-  getBySlug: (slug: string) => propertyRepository.findBySlug(slug),
+  getBySlug: cache((slug: string) => propertyRepository.findBySlug(slug)),
 
   getFeatured: (limit?: number) => propertyRepository.findFeatured(limit),
+
+  countActive: () => propertyRepository.countActive(),
 
   getRecommended: (excludeId: string, limit?: number) =>
     propertyRepository.findRecommended(excludeId, limit),

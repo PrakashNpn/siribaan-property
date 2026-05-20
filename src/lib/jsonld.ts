@@ -7,7 +7,7 @@ export const organizationJsonLd = {
   '@type': 'RealEstateAgent',
   name: 'Siribaan Property Group',
   url: BASE,
-  logo: `${BASE}/logo/logo-transparent.png`,
+  logo: `${BASE}/logo-symbol-transparent.png`,
   image: `${BASE}/og-default.jpg`,
   description:
     'Premium luxury real estate in Bangkok. A curated portfolio of exclusive residences in Sukhumvit, Riverside, and Thonglor.',

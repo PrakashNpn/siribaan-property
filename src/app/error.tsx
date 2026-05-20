@@ -19,7 +19,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 text-center py-24">
 
         <div className="w-14 h-14 relative mb-8">
-          <Image src="/logo/logo.png" alt="Siribaan Logo" fill sizes="56px" className="object-contain" />
+          <Image src="/logo-symbol.png" alt="Siribaan Logo" fill sizes="56px" className="object-contain" />
         </div>
 
         <div className="relative w-full max-w-lg rounded-3xl border border-white/70 overflow-hidden shadow-[0_24px_80px_rgba(18,93,229,0.15),_0_4px_24px_rgba(18,93,229,0.08)] px-8 py-12">

@@ -6,6 +6,9 @@ import { InquiryForm } from '@/features/inquiry/components/inquiry-form'
 import { MapEmbed } from '@/components/map-embed'
 import { AnimateIn, AnimateInView } from '@/components/animate-in'
 import { organizationJsonLd } from '@/lib/jsonld'
+import { propertyService } from '@/features/property/server/property.service'
+
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'About Us',
@@ -14,25 +17,19 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'About Us | Siribaan Property Group',
     description: 'Learn about Siribaan Property Group — Bangkok\'s leading luxury real estate specialists with a curated portfolio of exclusive residences across Sukhumvit, Riverside, and Thonglor.',
-    images: [{ url: '/og-about.jpg', width: 1200, height: 630, alt: 'Siribaan Property Group team and office' }],
+    images: [{ url: '/og-default.jpg', width: 1200, height: 630, alt: 'Siribaan Property Group' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'About Us | Siribaan Property Group',
     description: 'Learn about Siribaan Property Group — Bangkok\'s leading luxury real estate specialists.',
-    images: ['/og-about.jpg'],
+    images: ['/og-default.jpg'],
   },
 }
 
 const OFFICE_ADDRESS = '1840 Sukhumvit Rd, Phra Khanong Tai, Bangkok 10260'
 
-const stats = [
-  { value: '250+', label: 'Properties Listed' },
-  { value: '12', label: 'Years of Excellence' },
-  { value: '฿50B+', label: 'Portfolio Value' },
-  { value: '500+', label: 'Families Served' },
-]
 
 const values = [
   {
@@ -57,7 +54,14 @@ const values = [
   },
 ]
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const propertyCount = await propertyService.countActive()
+  const stats = [
+    { value: `${Math.floor(propertyCount / 5) * 5}+`, label: 'Properties Listed' },
+    { value: '24/7', label: 'Client Support' },
+    { value: '100%', label: 'Verified Listings' },
+    { value: '30+', label: 'Developer Partners' },
+  ]
   return (
     <>
       <script
@@ -79,7 +83,7 @@ export default function AboutPage() {
           <AnimateIn delay={0} duration={0.7} direction="none">
             <div className="relative h-[48vh] md:h-[55vh] rounded-3xl overflow-hidden">
               <Image
-                src="/siriban-about-hero.png"
+                src="/about-page-hero.png"
                 alt="Siribaan Property Group"
                 fill
                 sizes="(max-width: 768px) calc(100vw - 32px), 1280px"
@@ -197,25 +201,42 @@ export default function AboutPage() {
 
             {/* Large text card */}
             <AnimateInView delay={0} direction="left" className="lg:col-span-3">
-              <div className="bg-white/70 backdrop-blur-sm border border-blue-100/70 rounded-2xl shadow-[0_2px_16px_rgba(18,93,229,0.07)] p-8 md:p-10 flex flex-col justify-between h-full">
+              <div className="bg-white/70 backdrop-blur-sm border border-blue-100/70 rounded-2xl shadow-[0_2px_16px_rgba(18,93,229,0.07)] p-6 md:p-8 flex flex-col justify-between min-h-[580px]">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-[#125DE5] flex items-center gap-2 mb-6">
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#125DE5] flex items-center gap-2 mb-4">
                     <span className="w-6 h-px bg-[#125DE5]" />
                     Our Mission
                   </p>
                   <h2
-                    className="text-3xl md:text-4xl lg:text-5xl font-semibold leading-[1.1] text-gray-900 mb-6"
+                    className="text-3xl md:text-4xl lg:text-5xl font-semibold leading-[1.1] text-gray-900 mb-4"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
-                    Connecting Discerning<br />
-                    Clients with <span className="italic text-[#125DE5]">Exceptional</span><br />
-                    Homes
+                    Connecting Clients with<br />
+                    <span className="italic text-[#125DE5]">Exceptional</span> Homes
                   </h2>
-                  <p className="text-gray-500 text-[15px] leading-relaxed max-w-lg">
+                  <p className="text-gray-500 text-[15px] leading-relaxed">
                     Established to bridge the gap between the world&apos;s most exceptional residences and the clients who deserve them — we operate at the intersection of heritage and innovation, curating properties that stand as architectural masterpieces and sound long-term investments.
                   </p>
+
+                  {/* Differentiators */}
+                  <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-blue-100/60">
+                    {[
+                      { title: 'Exclusive Off-Market Access', desc: 'Private listings across Sukhumvit, Riverside & Thonglor not found elsewhere.' },
+                      { title: 'Bilingual Advisory Team', desc: 'Fluent in Thai & English — guiding local and international clients equally.' },
+                      { title: 'End-to-End Transaction Support', desc: 'From first viewing to signed contract, we handle every step for you.' },
+                    ].map(({ title, desc }) => (
+                      <div key={title} className="flex items-start gap-3">
+                        <span className="mt-1 w-1.5 h-1.5 rounded-full bg-[#125DE5] shrink-0" />
+                        <div>
+                          <p className="text-sm font-semibold text-gray-800">{title}</p>
+                          <p className="text-xs text-gray-400 leading-relaxed mt-0.5">{desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="mt-8">
+
+                <div className="mt-6">
                   <Link
                     href="/properties"
                     className="inline-flex items-center gap-2 bg-[#125DE5] hover:bg-blue-700 text-white font-semibold px-7 py-3.5 rounded-full transition-colors text-sm shadow-lg shadow-blue-500/20"
@@ -228,13 +249,13 @@ export default function AboutPage() {
 
             {/* Photo card */}
             <AnimateInView delay={0.15} direction="right" className="lg:col-span-2">
-              <div className="relative rounded-2xl overflow-hidden min-h-[280px] sm:min-h-[340px] lg:min-h-full">
+              <div className="relative rounded-2xl overflow-hidden min-h-[280px] sm:min-h-[340px] lg:min-h-[580px] bg-[#d8e6fc] flex items-center justify-center">
                 <Image
-                  src="/about-content.png"
+                  src="/about-mission.png"
                   alt="Siribaan Property"
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
-                  className=""
+                  className="object-contain"
                 />
                 <div className="absolute inset-0 bg-[#125DE5]/10" />
               </div>

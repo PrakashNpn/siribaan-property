@@ -16,7 +16,7 @@ export default function NotFound() {
 
         {/* Logo */}
         <div className="w-14 h-14 relative mb-8">
-          <Image src="/logo/logo.png" alt="Siribaan Logo" fill sizes="56px" className="object-contain" />
+          <Image src="/logo-symbol.png" alt="Siribaan Logo" fill sizes="56px" className="object-contain" />
         </div>
 
         {/* Glass card */}

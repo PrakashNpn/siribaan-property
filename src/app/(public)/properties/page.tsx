@@ -19,14 +19,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Luxury Properties in Bangkok | Siribaan Property Group',
     description: 'Browse our curated portfolio of luxury properties in Bangkok — Sukhumvit, Riverside, Thonglor, and beyond.',
-    images: [{ url: '/og-properties.jpg', width: 1200, height: 630, alt: 'Bangkok luxury property listings' }],
+    images: [{ url: '/og-default.jpg', width: 1200, height: 630, alt: 'Siribaan Property Group' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Luxury Properties in Bangkok | Siribaan Property Group',
     description: 'Browse our curated portfolio of luxury properties in Bangkok — Sukhumvit, Riverside, Thonglor, and beyond.',
-    images: ['/og-properties.jpg'],
+    images: ['/og-default.jpg'],
   },
 }
 
@@ -76,7 +76,7 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
         <FadeIn delay={0}>
           <div className="relative h-[240px] md:h-[300px] rounded-3xl overflow-hidden mb-10">
             <Image
-              src="/property-hero-2.png"
+              src="/listing-page-hero.png"
               alt="Luxury Bangkok properties"
               fill
               className="object-cover object-center"
@@ -92,9 +92,9 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
                   className="text-2xl md:text-4xl font-semibold text-blue-600 mb-2 md:mb-3 leading-tight"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
-                  Unveiling the Pinnacle<br />of Bangkok Living
+                  Redefining the Art<br />of Fine Living
                 </h1>
-                <p className="text-gray-500 text-xs md:text-sm leading-relaxed">A curated portfolio of Bangkok&apos;s most prestigious residences, where architectural innovation meets timeless elegance.</p>
+                <p className="text-gray-500 text-xs md:text-sm leading-relaxed">A curated portfolio of exceptional residences crafted for those who value architectural excellence and timeless design.</p>
               </div>
             </div>
           </div>
@@ -199,9 +199,8 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
           </div>
 
           {/* RIGHT — sticky CTA */}
-          <SlideRight delay={0.3}>
-            <div className="lg:col-span-1">
-              <div className="sticky top-24 rounded-2xl shadow-xl shadow-blue-200/40 border border-blue-100/60">
+          <SlideRight delay={0.3} className="lg:col-span-1 h-full">
+            <div className="sticky top-24 rounded-2xl shadow-xl shadow-blue-200/40 border border-blue-100/60">
                 <div className="relative bg-gradient-to-br from-[#0d4fd4] to-[#125DE5] px-6 py-6 overflow-hidden rounded-t-2xl">
                   <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-white/10 blur-2xl pointer-events-none" />
                   <div className="absolute bottom-0 -left-6 w-24 h-24 rounded-full bg-white/5 blur-xl pointer-events-none" />
@@ -215,7 +214,6 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
                   <InquiryForm variant="sidebar" />
                 </div>
               </div>
-            </div>
           </SlideRight>
 
         </div>

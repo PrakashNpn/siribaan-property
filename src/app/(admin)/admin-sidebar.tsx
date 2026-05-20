@@ -52,7 +52,7 @@ function SidebarContent({ onClose, unreadInquiries }: { onClose?: () => void; un
         <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-blue-400/20 blur-2xl pointer-events-none" />
         <Link href="/admin" onClick={onClose} className="relative flex items-center gap-2.5">
           <div className="w-8 h-8 relative shrink-0">
-            <Image src="/logo/logo.png" alt="Siribaan" fill sizes="32px" className="object-contain" />
+            <Image src="/logo-symbol-transparent.png" alt="Siribaan" fill sizes="32px" className="object-contain" />
           </div>
           <div>
             <p className="text-sm font-bold text-white leading-none">Siribaan</p>
@@ -129,7 +129,7 @@ export function AdminSidebar({ unreadInquiries }: { unreadInquiries?: number }) 
         </button>
         <Link href="/admin" className="flex items-center gap-2">
           <div className="w-6 h-6 relative">
-            <Image src="/logo/logo.png" alt="Siribaan" fill sizes="24px" className="object-contain" />
+            <Image src="/logo-symbol.png" alt="Siribaan" fill sizes="24px" className="object-contain" />
           </div>
           <span className="text-sm font-bold text-gray-900">Siribaan Admin</span>
         </Link>

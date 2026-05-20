@@ -3,10 +3,13 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, Bed, Bath, Square, Car } from 'lucide-react'
+import { AnimatePresence } from 'framer-motion'
 import { UnitType } from '@/features/property/types'
+import { Lightbox } from '@/components/lightbox'
 
 function ImageSlider({ images, name }: { images: string[]; name: string }) {
   const [current, setCurrent] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
 
   if (images.length === 0) {
     return (
@@ -20,62 +23,78 @@ function ImageSlider({ images, name }: { images: string[]; name: string }) {
   const next = () => setCurrent((c) => (c + 1) % images.length)
 
   return (
-    <div className="space-y-3">
-      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100 group">
-        <Image
-          key={current}
-          src={images[current]}
-          alt={`${name} image ${current + 1}`}
-          fill
-          className="object-cover transition-opacity duration-300"
-          sizes="(max-width: 768px) 100vw, 50vw"
-        />
+    <>
+      <div className="space-y-3">
+        <div
+          className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100 group cursor-zoom-in"
+          onClick={() => setLightboxOpen(true)}
+        >
+          <Image
+            key={current}
+            src={images[current]}
+            alt={`${name} image ${current + 1}`}
+            fill
+            className="object-cover transition-opacity duration-300"
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); prev() }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); next() }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <ChevronRight size={16} />
+              </button>
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {images.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={(e) => { e.stopPropagation(); setCurrent(i) }}
+                    className={`h-1.5 rounded-full transition-all duration-200 ${i === current ? 'bg-white w-4' : 'bg-white/50 w-1.5'}`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
+          <div className="absolute top-3 right-3 bg-black/40 text-white text-xs px-2 py-1 rounded-full">
+            {current + 1} / {images.length}
+          </div>
+        </div>
 
         {images.length > 1 && (
-          <>
-            <button
-              onClick={prev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <button
-              onClick={next}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <ChevronRight size={16} />
-            </button>
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-              {images.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrent(i)}
-                  className={`h-1.5 rounded-full transition-all duration-200 ${i === current ? 'bg-white w-4' : 'bg-white/50 w-1.5'}`}
-                />
-              ))}
-            </div>
-          </>
+          <div className="flex gap-2 overflow-x-auto p-1">
+            {images.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`relative w-20 h-14 rounded-lg overflow-hidden shrink-0 transition-all duration-200 ${i === current ? 'ring-2 ring-[#125DE5] ring-offset-1' : 'opacity-60 hover:opacity-100'}`}
+              >
+                <Image src={img} alt="" fill className="object-cover" sizes="80px" />
+              </button>
+            ))}
+          </div>
         )}
-
-        <div className="absolute top-3 right-3 bg-black/40 text-white text-xs px-2 py-1 rounded-full">
-          {current + 1} / {images.length}
-        </div>
       </div>
 
-      {images.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {images.map((img, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`relative w-16 h-12 rounded-lg overflow-hidden shrink-0 transition-all duration-200 ${i === current ? 'ring-2 ring-[#125DE5] ring-offset-1' : 'opacity-60 hover:opacity-100'}`}
-            >
-              <Image src={img} alt="" fill className="object-cover" sizes="64px" />
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+      <AnimatePresence>
+        {lightboxOpen && (
+          <Lightbox
+            images={images}
+            initialIndex={current}
+            title={name}
+            onClose={() => setLightboxOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+    </>
   )
 }
 

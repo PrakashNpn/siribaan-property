@@ -24,7 +24,7 @@ export function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
             <div className="w-9 h-9 relative">
-              <Image src="/logo/logo-transparent.png" alt="Siribaan Logo" fill sizes="36px" className="object-contain" />
+              <Image src="/logo-symbol-transparent.png" alt="Siribaan Logo" fill sizes="36px" className="object-contain" />
             </div>
             <span className="font-bold text-sm text-blue-600 uppercase tracking-wider leading-tight">
               Siribaan<br />Property
