@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Cormorant_Garamond } from 'next/font/google'
 import { Toaster } from 'sonner'
 import NextTopLoader from 'nextjs-toploader'
+import { Analytics } from '@vercel/analytics/next'
 import { organizationJsonLd } from '@/lib/jsonld'
 import './globals.css'
 
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         {children}
         <Toaster position="bottom-right" richColors />
+        <Analytics />
       </body>
     </html>
   )
