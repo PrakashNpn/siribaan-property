@@ -29,7 +29,7 @@ export const propertyService = {
   delete: (id: string) => propertyRepository.delete(id),
 
   getAllAdmin: (
-    filters?: { search?: string; status?: string; type?: string; sort?: string },
+    filters?: { search?: string; status?: string; type?: string; sort?: string; featured?: string },
     pagination?: { page?: number; pageSize?: number }
   ) => propertyRepository.findAllAdmin(filters, pagination),
 

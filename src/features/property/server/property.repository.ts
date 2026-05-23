@@ -14,7 +14,12 @@ export const propertyRepository = {
 
     const where = {
       status: 'active',
-      ...(filters?.location && { location: { contains: filters.location, mode: 'insensitive' as const } }),
+      ...(filters?.location && {
+        OR: [
+          { location: { contains: filters.location, mode: 'insensitive' as const } },
+          { title: { contains: filters.location, mode: 'insensitive' as const } },
+        ],
+      }),
       ...(filters?.type && filters.type !== 'All' && { type: filters.type }),
       ...((filters?.minPrice !== undefined || filters?.maxPrice !== undefined) && {
         startingPrice: {
@@ -77,7 +82,7 @@ export const propertyRepository = {
     withRetry(() => prisma.property.delete({ where: { id } })),
 
   findAllAdmin: async (
-    filters?: { search?: string; status?: string; type?: string; sort?: string },
+    filters?: { search?: string; status?: string; type?: string; sort?: string; featured?: string },
     pagination?: { page?: number; pageSize?: number }
   ) => {
     const page = pagination?.page ?? 1
@@ -93,6 +98,8 @@ export const propertyRepository = {
       }),
       ...(filters?.status && filters.status !== 'all' && { status: filters.status }),
       ...(filters?.type && filters.type !== 'all' && { type: filters.type }),
+      ...(filters?.featured === 'featured' && { featured: true }),
+      ...(filters?.featured === 'not-featured' && { featured: false }),
     }
 
     const isPriceSort = filters?.sort === 'price-asc' || filters?.sort === 'price-desc'

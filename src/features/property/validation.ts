@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const PROPERTY_TYPES = ['Condo', 'House', 'Villa', 'Townhouse', 'Apartment'] as const
 export const PROPERTY_STATUSES = ['active', 'inactive'] as const
 export const LISTING_TYPES = ['Sale', 'Rent', 'Sale & Rent'] as const
-export const PROJECT_STATUSES = ['Completed', 'Ready to Move', 'Under Construction'] as const
+export const PROJECT_STATUSES = ['Ready to Move', 'Off Plan'] as const
 
 export const propertySchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -17,6 +17,7 @@ export const propertySchema = z.object({
   listingType: z.enum(LISTING_TYPES),
   projectStatus: z.enum(PROJECT_STATUSES).optional().nullable(),
   startingPrice: z.number().positive().optional().nullable(),
+  rentalYield: z.number().positive().max(100).optional().nullable(),
   location: z.string().min(1, 'Location is required'),
   address: z.string().min(1, 'Address is required'),
   mapUrl: z.string().optional().nullable(),

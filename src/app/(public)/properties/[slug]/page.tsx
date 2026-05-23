@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { MapPin, Bed, Bath, Square, ArrowRight, ChevronRight, Building2, Layers, CalendarDays, Home, Check, Tag } from 'lucide-react'
+import { MapPin, Bed, Bath, Square, ArrowRight, ChevronRight, Building2, Layers, CalendarDays, Home, Check, Tag, TrendingUp } from 'lucide-react'
 import { DescriptionExpander } from './description-expander'
 import { UnitTypeTabs } from './unit-type-tabs'
 import { propertyService } from '@/features/property/server/property.service'
@@ -186,6 +186,15 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                         <div>
                           <p className="text-[9px] uppercase tracking-widest text-gray-400 leading-none mb-1">Status</p>
                           <p className="text-xs font-bold text-gray-900 leading-none">{property.projectStatus}</p>
+                        </div>
+                      </div>
+                    )}
+                    {property.rentalYield != null && (
+                      <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 bg-white/60">
+                        <TrendingUp size={13} className="text-[#125DE5] shrink-0" />
+                        <div>
+                          <p className="text-[9px] uppercase tracking-widest text-gray-400 leading-none mb-1">Rental Yield</p>
+                          <p className="text-xs font-bold text-gray-900 leading-none">{property.rentalYield}%</p>
                         </div>
                       </div>
                     )}

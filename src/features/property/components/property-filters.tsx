@@ -147,10 +147,10 @@ export function PropertyFilters() {
       <div className="flex-1 basis-0 flex items-center gap-3 bg-gradient-to-br from-gray-100 to-slate-200/90 border border-white/80 shadow-inner rounded-2xl px-3 py-1.5">
         <MapPin size={15} className="text-blue-600 shrink-0" />
         <div className="flex-1">
-          <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-0.5">Location</p>
+          <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-0.5">Name or Location</p>
           <input
             type="text"
-            placeholder="Sukhumvit, Bangkok"
+            placeholder="Name or Location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}

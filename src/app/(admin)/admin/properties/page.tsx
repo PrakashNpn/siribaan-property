@@ -10,7 +10,7 @@ import { AdminFilters } from './admin-filters'
 
 export const dynamic = 'force-dynamic'
 
-interface SearchParams { search?: string; status?: string; type?: string; sort?: string; page?: string }
+interface SearchParams { search?: string; status?: string; type?: string; sort?: string; featured?: string; page?: string }
 
 const TYPE_COLORS: Record<string, string> = {
   Villa:     'bg-amber-50 text-amber-700 border-amber-100',
@@ -24,7 +24,7 @@ export default async function AdminPropertiesPage({ searchParams }: { searchPara
   const sp = await searchParams
   const page = Math.max(1, parseInt(sp.page ?? '1'))
   const { properties, total, totalPages } = await propertyService.getAllAdmin(
-    { search: sp.search, status: sp.status, type: sp.type, sort: sp.sort },
+    { search: sp.search, status: sp.status, type: sp.type, sort: sp.sort, featured: sp.featured },
     { page, pageSize: 20 }
   )
 
@@ -64,6 +64,7 @@ export default async function AdminPropertiesPage({ searchParams }: { searchPara
           status={sp.status ?? 'all'}
           type={sp.type ?? 'all'}
           sort={sp.sort ?? 'newest'}
+          featured={sp.featured ?? 'all'}
         />
       </Suspense>
 

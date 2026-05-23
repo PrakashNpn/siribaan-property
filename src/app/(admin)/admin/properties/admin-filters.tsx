@@ -15,6 +15,12 @@ const TYPE_OPTIONS = [
   ...PROPERTY_TYPES.map((t) => ({ value: t, label: t })),
 ]
 
+const FEATURED_OPTIONS = [
+  { value: 'all', label: 'All Properties' },
+  { value: 'featured', label: 'Featured' },
+  { value: 'not-featured', label: 'Not Featured' },
+]
+
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest First' },
   { value: 'oldest', label: 'Oldest First' },
@@ -91,11 +97,13 @@ export function AdminFilters({
   status,
   type,
   sort,
+  featured,
 }: {
   search: string
   status: string
   type: string
   sort?: string
+  featured?: string
 }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -120,7 +128,7 @@ export function AdminFilters({
   }, [searchValue])
 
   const hasFilters =
-    search || (status && status !== 'all') || (type && type !== 'all') || (sort && sort !== 'newest')
+    search || (status && status !== 'all') || (type && type !== 'all') || (sort && sort !== 'newest') || (featured && featured !== 'all')
 
   const clearAll = () => {
     setSearchValue('')
@@ -167,6 +175,13 @@ export function AdminFilters({
         value={type || 'all'}
         onChange={(v) => push('type', v)}
         options={TYPE_OPTIONS}
+      />
+
+      {/* Featured filter */}
+      <PremiumSelect
+        value={featured || 'all'}
+        onChange={(v) => push('featured', v)}
+        options={FEATURED_OPTIONS}
       />
 
       {/* Sort */}
