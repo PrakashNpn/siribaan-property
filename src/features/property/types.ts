@@ -25,6 +25,7 @@ export interface Property {
   listingType: string
   projectStatus?: string | null
   startingPrice?: number | null
+  rentalYield?: number | null
   location: string
   address: string
   mapUrl?: string | null

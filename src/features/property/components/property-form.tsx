@@ -152,6 +152,7 @@ export function PropertyForm({ property }: PropertyFormProps) {
       listingType: (property.listingType || 'Sale') as typeof LISTING_TYPES[number],
       projectStatus: (property.projectStatus || undefined) as typeof PROJECT_STATUSES[number] | undefined,
       startingPrice: property.startingPrice ?? undefined,
+      rentalYield: property.rentalYield ?? undefined,
       location: property.location,
       address: property.address,
       mapUrl: property.mapUrl || '',
@@ -603,6 +604,19 @@ export function PropertyForm({ property }: PropertyFormProps) {
             className={inputClass}
           />
           {errors.startingPrice && <p className="text-red-500 text-xs mt-1">{errors.startingPrice.message}</p>}
+        </div>
+        <div>
+          <label className={labelClass}>Rental Yield % (optional)</label>
+          <input
+            {...register('rentalYield', { setValueAs: (v) => v === '' ? null : Number(v) })}
+            type="number"
+            min="0"
+            max="100"
+            step="0.1"
+            placeholder="e.g. 8.5"
+            className={inputClass}
+          />
+          {errors.rentalYield && <p className="text-red-500 text-xs mt-1">{errors.rentalYield.message}</p>}
         </div>
       </div>
 

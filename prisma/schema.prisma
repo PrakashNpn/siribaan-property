@@ -23,6 +23,7 @@ model Property {
   listingType    String   @default("Sale")
   projectStatus  String?
   startingPrice  Float?
+  rentalYield    Float?
   yearBuilt      Int?
   completionDate String?
   totalFloors    Int?
