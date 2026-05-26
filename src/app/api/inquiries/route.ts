@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const { name, email, phone, message, preferredDate, propertyId } = parsed.data
     const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
     await resend.emails.send({
-      from: 'Siribaan Website <onboarding@resend.dev>',
+      from: 'Siribaan Website <noreply@siribaanproperty.com>',
       to: process.env.INQUIRY_EMAIL_TO,
       subject: `New Inquiry from ${name}`,
       html: `
