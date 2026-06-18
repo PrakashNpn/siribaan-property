@@ -76,7 +76,7 @@ export function Footer() {
               <p>Bangkok 10260</p>
               <a href="tel:+66910062564" className="flex items-center gap-2 pt-1 hover:text-white transition-colors">
                 <Phone size={13} className="shrink-0 text-[#125DE5]" />
-                091 006 2564
+                +6691 006 2564
               </a>
               <a href="mailto:info@siribaanproperty.com" className="flex items-center gap-2 hover:text-white transition-colors break-all">
                 <Mail size={13} className="shrink-0 text-[#125DE5]" />

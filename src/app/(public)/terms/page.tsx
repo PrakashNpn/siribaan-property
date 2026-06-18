@@ -26,12 +26,12 @@ export default function TermsPage() {
         >
           Terms of Service
         </h1>
-        <p className="text-white/50 text-sm mt-4">Last updated: 1 January 2026</p>
+        <p className="text-white/50 text-sm mt-4">Last updated: 18 June 2026</p>
       </div>
 
       {/* Content */}
       <div className="max-w-3xl mx-auto px-6 py-16">
-        <div className="bg-white/70 backdrop-blur-sm border border-blue-100/70 rounded-2xl shadow-[0_2px_16px_rgba(18,93,229,0.07)] p-8 md:p-12 space-y-10 text-gray-700 leading-relaxed">
+        <div className="bg-white/70 backdrop-blur-sm border border-blue-100/70 rounded-2xl shadow-[0_2px_16px_rgba(18,93,229,0.07)] p-8 md:p-12 space-y-10 text-gray-700 leading-relaxed text-justify">
 
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-3">1. Acceptance of Terms</h2>
@@ -43,7 +43,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-3">2. Eligibility</h2>
             <p>
-              You must be at least 20 years of age — the age of legal majority under Thai law — or acting with the consent of a parent or legal guardian, to use our website or submit inquiries. By using our services, you represent and warrant that you meet this eligibility requirement. We reserve the right to refuse service to anyone for any reason at any time.
+              You must be at least 20 years of age (the age of legal majority under Thai law) or acting with the consent of a parent or legal guardian, to use our website or submit inquiries. By using our services, you represent and warrant that you meet this eligibility requirement. We reserve the right to refuse service to anyone for any reason at any time.
             </p>
           </section>
 
@@ -94,7 +94,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-3">7. Intellectual Property</h2>
             <p>
-              All content on this website — including but not limited to text, property listings, photographs, videos, logos, graphics, design layouts, and software code — is the property of Siribaan Property Group or its licensors and is protected under Thai and international copyright, trademark, and intellectual property law. You are granted a limited, non-exclusive, non-transferable licence to access and use the website for personal, non-commercial purposes only. No rights are granted beyond this scope without our prior written consent.
+              All content on this website, including but not limited to text, property listings, photographs, videos, logos, graphics, design layouts, and software code, is the property of Siribaan Property Group or its licensors and is protected under Thai and international copyright, trademark, and intellectual property law. You are granted a limited, non-exclusive, non-transferable licence to access and use the website for personal, non-commercial purposes only. No rights are granted beyond this scope without our prior written consent.
             </p>
           </section>
 
@@ -108,14 +108,14 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-3">9. Disclaimer of Warranties</h2>
             <p>
-              This website and all its content are provided on an "as is" and "as available" basis. To the fullest extent permitted by applicable law, Siribaan Property Group expressly disclaims all warranties of any kind, whether express, implied, or statutory — including but not limited to implied warranties of merchantability, fitness for a particular purpose, accuracy, and non-infringement. We do not warrant that the website will be uninterrupted, error-free, secure, or free of viruses or other harmful components.
+              This website and all its content are provided on an "as is" and "as available" basis. To the fullest extent permitted by applicable law, Siribaan Property Group expressly disclaims all warranties of any kind, whether express, implied, or statutory, including but not limited to implied warranties of merchantability, fitness for a particular purpose, accuracy, and non-infringement. We do not warrant that the website will be uninterrupted, error-free, secure, or free of viruses or other harmful components.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-3">10. Limitation of Liability</h2>
             <p className="mb-3">
-              To the fullest extent permitted by law, Siribaan Property Group, its directors, employees, agents, and affiliates shall not be liable for any indirect, incidental, special, consequential, or punitive damages — including but not limited to loss of profit, revenue, data, goodwill, or business opportunity — arising from:
+              To the fullest extent permitted by law, Siribaan Property Group, its directors, employees, agents, and affiliates shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profit, revenue, data, goodwill, or business opportunity, arising from:
             </p>
             <ul className="list-disc list-inside space-y-2 text-gray-600">
               <li>Your use of, or inability to use, the website or its services.</li>
